@@ -1,0 +1,66 @@
+﻿<Window x:Class="RedditReader.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Reddit Backgrounds" Height="362" Width="488" ResizeMode="CanResizeWithGrip">
+    <DockPanel>
+        <StatusBar DockPanel.Dock="Bottom">
+            <StatusBar.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="20*" />
+                            <ColumnDefinition Width="75*" />
+                            <ColumnDefinition Width="5*" />
+                        </Grid.ColumnDefinitions>
+                    </Grid>
+                </ItemsPanelTemplate>
+            </StatusBar.ItemsPanel>
+            <StatusBarItem Grid.Column="0">
+                <TextBlock  Name="currentStatus">Bored</TextBlock>
+            </StatusBarItem>
+            <StatusBarItem Grid.Column="1" HorizontalContentAlignment="Stretch">
+                <ProgressBar Name="currentProgress" Value="0" Height="18" />
+            </StatusBarItem>
+        </StatusBar>
+        <Menu Width="Auto" Height="20" DockPanel.Dock="Top">
+            <MenuItem Header="File" />
+            <MenuItem Header="Settings" />
+        </Menu>
+        <Grid 
+            DockPanel.Dock="Left" 
+            Background="Gray">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="70*" />
+                <ColumnDefinition Width="30*"/>
+            </Grid.ColumnDefinitions>
+            <Rectangle Grid.Column="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                <Rectangle.Fill>
+                    <LinearGradientBrush StartPoint="0,1" EndPoint="1,0">
+                        <GradientStop Color="Gray" Offset="0" />
+                        <GradientStop Color="DarkGray" Offset="1" />
+                    </LinearGradientBrush>
+                </Rectangle.Fill>
+            </Rectangle>
+            <Rectangle Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                <Rectangle.Fill>
+                    <LinearGradientBrush StartPoint="0,0.5" EndPoint="1,0.5">
+                        <GradientStop Color="#707070" Offset="0" />
+                        <GradientStop Color="#696969" Offset="1" />
+                    </LinearGradientBrush>
+                </Rectangle.Fill>
+            </Rectangle>
+            <ScrollViewer 
+                Grid.Column="0"  
+                HorizontalScrollBarVisibility="Disabled" 
+                VerticalScrollBarVisibility="Auto"
+                >
+                <WrapPanel HorizontalAlignment="Stretch" VerticalAlignment="Stretch" x:Name="RedditPhotos">
+
+                </WrapPanel>
+            </ScrollViewer>
+        </Grid>
+    </DockPanel>
+</Window>
