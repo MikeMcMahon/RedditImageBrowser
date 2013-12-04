@@ -23,6 +23,20 @@ namespace RedditReader
         public MainWindow()
         {
             InitializeComponent();
+
+            TextBlock label;
+            Thumbnail thumb;
+            for (int i = 0; i < 100; i++)
+            {
+                label = new TextBlock();
+                label.Text = "/r/Earthporn";
+                SubredditLabels.Children.Add(label);
+                thumb = new Thumbnail();
+                thumb.Width = 100;
+                thumb.Height = 100;
+                thumb.Background = Brushes.Black;
+                Thumbnails.Children.Add(thumb);
+            }
         }
     }
 }
