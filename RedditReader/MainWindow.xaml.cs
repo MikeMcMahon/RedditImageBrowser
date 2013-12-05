@@ -31,10 +31,14 @@ namespace RedditReader
                 label = new TextBlock();
                 label.Text = "/r/Earthporn";
                 SubredditLabels.Children.Add(label);
+
                 thumb = new Thumbnail();
-                thumb.Width = 100;
                 thumb.Height = 100;
-                thumb.Background = Brushes.Black;
+                thumb.Width = 100;
+                thumb.ThumbnailText = "SOME TEXT";
+                thumb.ThumbnailBorder = Brushes.Green;
+                thumb.Margin = new Thickness(5, 0, 5, 0);
+
                 Thumbnails.Children.Add(thumb);
             }
         }

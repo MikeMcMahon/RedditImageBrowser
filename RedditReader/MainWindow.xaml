@@ -68,7 +68,8 @@
                     </ScrollViewer>
                 <ScrollViewer Grid.Column="1" HorizontalScrollBarVisibility="Disabled"
                         VerticalScrollBarVisibility="Auto">
-                    <WrapPanel x:Name="Thumbnails" Orientation="Horizontal"></WrapPanel>
+                    <WrapPanel x:Name="Thumbnails" Orientation="Horizontal">
+                    </WrapPanel>
                 </ScrollViewer>
             </Grid>
         </Grid>
