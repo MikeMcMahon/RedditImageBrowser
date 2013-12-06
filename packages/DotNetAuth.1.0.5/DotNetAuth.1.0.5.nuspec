@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
+  <metadata>
+    <id>DotNetAuth</id>
+    <version>1.0.5</version>
+    <title>DotNetAuth</title>
+    <authors>Sam Naseri</authors>
+    <owners>Sam Naseri</owners>
+    <projectUrl>https://bitbucket.org/samnaseri/dotnetauth</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>A simple implementation of OAuth 1.0a and OAuth 2.0 protocols only supporting the consumer serverside flow. Complemented by DotNetAuth.Profiles to make it more better.</description>
+    <releaseNotes />
+    <copyright>Copyright © Sam Naseri 2012</copyright>
+    <language />
+    <tags>OAuth</tags>
+    <dependencies>
+      <dependency id="Newtonsoft.Json" version="4.5.8" />
+      <dependency id="RestSharp" version="103.4" />
+      <dependency id="TaskParallelLibrary" version="1.0.2856.0" />
+    </dependencies>
+  </metadata>
+</package>

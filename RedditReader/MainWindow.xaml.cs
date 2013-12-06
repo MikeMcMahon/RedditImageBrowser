@@ -1,4 +1,5 @@
-﻿using System;
+﻿using RedditReader.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -26,20 +27,28 @@ namespace RedditReader
 
             TextBlock label;
             Thumbnail thumb;
-            for (int i = 0; i < 100; i++)
+            RedditAPI api = new RedditAPI();
+            Listing.RootObject listings = api.GetListing("/r/earthporn");
+
+            label = new TextBlock();
+            label.Text = "/r/" + listings.data.children[0].data.subreddit;
+            SubredditLabels.Children.Add(label);
+
+            foreach (var listing in listings.data.children)
             {
-                label = new TextBlock();
-                label.Text = "/r/Earthporn";
-                SubredditLabels.Children.Add(label);
-
-                thumb = new Thumbnail();
-                thumb.Height = 100;
-                thumb.Width = 100;
-                thumb.ThumbnailText = "SOME TEXT";
-                thumb.ThumbnailBorder = Brushes.Green;
-                thumb.Margin = new Thickness(5, 0, 5, 0);
-
-                Thumbnails.Children.Add(thumb);
+                if (listing.kind.ToLower().Equals("t3") && listing.data.url.ToLower().EndsWith(".jpg"))
+                {
+                    thumb = new Thumbnail();
+                    thumb.Height = 125;
+                    thumb.Width = 125;
+                    thumb.ThumbnailBorder = Brushes.Black;
+                    thumb.BorderThickness = new Thickness(4, 4, 4, 4);
+                    thumb.Margin = new Thickness(10, 10, 10, 0);
+                    thumb.ThumbnailText = listing.data.name;
+                    thumb.ThumbnailBorderHighlight = Brushes.CornflowerBlue;
+                    //thumb.ThumbnailUrl = new Uri(listing.data.url);
+                    Thumbnails.Children.Add(thumb);
+                }
             }
         }
     }

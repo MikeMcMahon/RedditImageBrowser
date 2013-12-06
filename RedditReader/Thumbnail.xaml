@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:local="clr-namespace:RedditReader" x:Class="RedditReader.Thumbnail" 
+             xmlns:local="clr-namespace:RedditReader" x:Class="RedditReader.Thumbnail"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300">
     <Grid>
@@ -14,17 +14,49 @@
             <RowDefinition Height="80*" />
             <RowDefinition Height="20*" />
         </Grid.RowDefinitions>
-        <Rectangle 
+        <Rectangle
             Grid.Row="0" 
-            Grid.Column="0" 
-            Stroke="{Binding ThumbnailBorder, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:Thumbnail}}}" 
+            Grid.Column="0"
             HorizontalAlignment="Stretch" 
-            VerticalAlignment="Stretch" />
+            Fill="Black"
+            VerticalAlignment="Stretch"
+        />
+        <Image
+            Grid.Row="0"
+            Grid.Column="0"
+            HorizontalAlignment="Stretch"
+            VerticalAlignment="Stretch"
+            Stretch="Uniform"
+            >
+            <Image.Source>
+                <BitmapImage
+                    DecodePixelWidth="100"
+                    UriSource="{Binding ThumbnailUrl, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:Thumbnail}}}" />
+            </Image.Source>
+        </Image>
+        <Rectangle
+            Grid.Row="1"
+            Grid.Column="1"
+            Stroke="Black"
+            StrokeThickness=".5"
+            RadiusX="2"
+            RadiusY="2"
+            Margin="0,5,0,0"
+            HorizontalAlignment="Stretch">
+            <Rectangle.Fill>
+                <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                    <GradientStop Color="#9F9F9F" Offset="0" />
+                    <GradientStop Color="#909090" Offset="1" />
+                </LinearGradientBrush>
+            </Rectangle.Fill>
+        </Rectangle>
         <TextBlock 
             Grid.Row="1" 
             Grid.Column="0" 
             HorizontalAlignment="Stretch"
             TextAlignment="Center"
+            FontWeight="Bold"
+            Margin="0,5,0,0"
             Text="{Binding ThumbnailText, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:Thumbnail}}}" />
     </Grid>
 </UserControl>
