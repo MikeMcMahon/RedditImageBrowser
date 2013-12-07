@@ -27,13 +27,7 @@
             HorizontalAlignment="Stretch"
             VerticalAlignment="Stretch"
             Stretch="Uniform"
-            >
-            <Image.Source>
-                <BitmapImage
-                    DecodePixelWidth="100"
-                    UriSource="{Binding ThumbnailUrl, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:Thumbnail}}}" />
-            </Image.Source>
-        </Image>
+            Source="{Binding ThumbnailUrl, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:Thumbnail}}}" />
         <Rectangle
             Grid.Row="1"
             Grid.Column="1"

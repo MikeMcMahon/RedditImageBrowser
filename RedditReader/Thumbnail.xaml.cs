@@ -23,15 +23,13 @@ namespace RedditReader
         public Thumbnail()
         {
             InitializeComponent();
-
-            this.ThumbnailUrl = new Uri("pack://application:,,,/Assets/Loading.png");
         }
 
         public static readonly DependencyProperty ThumbnailTextProperty = 
             DependencyProperty.Register("ThumbnailText", typeof(String), typeof(Thumbnail), new FrameworkPropertyMetadata(string.Empty));
 
         public static readonly DependencyProperty ThumbnailUrlProperty =
-            DependencyProperty.Register("ThumbnailUrl", typeof(Uri), typeof(Thumbnail), new FrameworkPropertyMetadata(new Uri("pack://application:,,,/Assets/Loading.png")));
+            DependencyProperty.Register("ThumbnailUrl", typeof(String), typeof(Thumbnail), new FrameworkPropertyMetadata(string.Empty));
 
         public static readonly DependencyProperty ThumbnailBorderProperty =
             DependencyProperty.Register("ThumbnailBorder", typeof(Brush), typeof(Thumbnail), new FrameworkPropertyMetadata(Brushes.Transparent));
@@ -73,9 +71,9 @@ namespace RedditReader
             set { SetValue(ThumbnailTextProperty, value); }
         }
 
-        public Uri ThumbnailUrl
+        public string ThumbnailUrl
         {
-            get { return (Uri)GetValue(ThumbnailUrlProperty); }
+            get { return (string)GetValue(ThumbnailUrlProperty); }
             set { SetValue(ThumbnailUrlProperty, value); }
         }
     }

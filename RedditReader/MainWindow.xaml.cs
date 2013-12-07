@@ -46,10 +46,13 @@ namespace RedditReader
                     thumb.Margin = new Thickness(10, 10, 10, 0);
                     thumb.ThumbnailText = listing.data.name;
                     thumb.ThumbnailBorderHighlight = Brushes.CornflowerBlue;
-                    //thumb.ThumbnailUrl = new Uri(listing.data.url);
+                    thumb.ThumbnailUrl = listing.data.url;
                     Thumbnails.Children.Add(thumb);
                 }
             }
+
+            Configuration config = new Configuration();
+            config.Show();
         }
     }
 }
