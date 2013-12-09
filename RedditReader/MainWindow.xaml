@@ -68,15 +68,17 @@
                     Grid.Column="0"
                     x:Name="RedditImages">
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="2*" />
-                        <ColumnDefinition Width="8*" />
+                        <ColumnDefinition Width="25*" />
+                        <ColumnDefinition Width="75*" />
                     </Grid.ColumnDefinitions>
                     <ScrollViewer 
                         Grid.Column="0" 
                         HorizontalScrollBarVisibility="Disabled"
                         VerticalScrollBarVisibility="Auto" 
                         >
-                        <WrapPanel x:Name="SubredditLabels" Orientation="Vertical"></WrapPanel>
+                        <WrapPanel x:Name="SubredditLabels" Orientation="Vertical" HorizontalAlignment="Center">
+                            
+                        </WrapPanel>
                     </ScrollViewer>
                 <ScrollViewer Grid.Column="1" HorizontalScrollBarVisibility="Disabled"
                         VerticalScrollBarVisibility="Auto">

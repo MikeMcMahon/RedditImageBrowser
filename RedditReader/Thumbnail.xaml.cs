@@ -37,27 +37,36 @@ namespace RedditReader
         public static readonly DependencyProperty ThumbnailBorderHighlightProperty =
             DependencyProperty.Register("ThumbnailBorderHighlight", typeof(Brush), typeof(Thumbnail), new FrameworkPropertyMetadata(Brushes.Transparent));
 
-        private Brush borderOrig = null;
+        public static readonly DependencyProperty SelectedProperty =
+            DependencyProperty.Register("Selected", typeof(bool), typeof(Thumbnail), new FrameworkPropertyMetadata(false));
 
+        private Brush originalBorder = null;
         protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
         {
-            base.OnMouseLeftButtonDown(e);
-            if (borderOrig == null)
-                borderOrig = this.ThumbnailBorder;
-            this.ThumbnailBorder = this.ThumbnailBorderHighlight;
-        }
+            if (this.originalBorder == null)
+                originalBorder = this.ThumbnailBorder;
 
-        protected override void OnMouseLeftButtonUp(MouseButtonEventArgs e)
-        {
-            base.OnMouseLeftButtonUp(e);
-            this.ThumbnailBorder = borderOrig;
+            this.Selected = !this.Selected;
+            Brush brush = originalBorder;
+            if (this.Selected)
+                brush = this.ThumbnailBorderHighlight;
+
+            this.ThumbnailBorder = brush;
+
+            base.OnMouseLeftButtonDown(e);
         }
 
         public Brush ThumbnailBorderHighlight
         {
             get { return (Brush)GetValue(ThumbnailBorderHighlightProperty); }
             set { SetValue(ThumbnailBorderHighlightProperty, value); } 
-        }/**/
+        }
+
+        public bool Selected
+        {
+            get { return (bool)GetValue(SelectedProperty); }
+            set { SetValue(SelectedProperty, value); }
+        }
 
         public Brush ThumbnailBorder
         {

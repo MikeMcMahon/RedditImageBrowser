@@ -46,6 +46,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Net" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Net.Http.WebRequest" />
@@ -53,6 +54,7 @@
       <Private>True</Private>
       <HintPath>..\packages\TaskParallelLibrary.1.0.2856.0\lib\Net35\System.Threading.dll</HintPath>
     </Reference>
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
@@ -72,6 +74,9 @@
     </ApplicationDefinition>
     <Compile Include="Json\Listing.cs" />
     <Compile Include="RedditAPI.cs" />
+    <Compile Include="SubredditLabel.xaml.cs">
+      <DependentUpon>SubredditLabel.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Thumbnail.xaml.cs">
       <DependentUpon>Thumbnail.xaml</DependentUpon>
     </Compile>
@@ -93,6 +98,10 @@
     <Page Include="Common\StandardStyles.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="SubredditLabel.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Thumbnail.xaml">
       <SubType>Designer</SubType>
