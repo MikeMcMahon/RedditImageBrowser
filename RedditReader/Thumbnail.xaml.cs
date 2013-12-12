@@ -20,6 +20,14 @@ namespace RedditReader
     /// </summary>
     public partial class Thumbnail : UserControl
     {
+        public class SelectedEventArgs : EventArgs {
+            public bool IsSelected { get; set; }
+            public SelectedEventArgs(bool selected)
+                 {
+                     this.IsSelected = selected;
+                 }
+        }
+
         public Thumbnail()
         {
             InitializeComponent();
@@ -41,19 +49,23 @@ namespace RedditReader
             DependencyProperty.Register("Selected", typeof(bool), typeof(Thumbnail), new FrameworkPropertyMetadata(false));
 
         private Brush originalBorder = null;
-        protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
-        {
+
+        private void SwapVisualState() {
             if (this.originalBorder == null)
                 originalBorder = this.ThumbnailBorder;
 
-            this.Selected = !this.Selected;
             Brush brush = originalBorder;
             if (this.Selected)
                 brush = this.ThumbnailBorderHighlight;
 
             this.ThumbnailBorder = brush;
+        }
 
-            base.OnMouseLeftButtonDown(e);
+        public event EventHandler<SelectedEventArgs> OnSelected;
+        protected virtual void OnThumbnailSelected(SelectedEventArgs e)
+        {
+            if (OnSelected != null)
+                OnSelected(this, e);
         }
 
         public Brush ThumbnailBorderHighlight
@@ -62,10 +74,18 @@ namespace RedditReader
             set { SetValue(ThumbnailBorderHighlightProperty, value); } 
         }
 
+        /// <summary>
+        /// When the item is activated via click
+        /// </summary>
         public bool Selected
         {
             get { return (bool)GetValue(SelectedProperty); }
-            set { SetValue(SelectedProperty, value); }
+            set {
+                SetValue(SelectedProperty, value);
+                if (value)
+                    OnThumbnailSelected(new SelectedEventArgs(value));
+                SwapVisualState();
+            }
         }
 
         public Brush ThumbnailBorder

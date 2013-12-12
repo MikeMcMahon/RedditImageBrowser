@@ -10,10 +10,19 @@
         <Rectangle VerticalAlignment="Stretch"
                    HorizontalAlignment="Stretch"
                    Stroke="#404040"
-                   StrokeThickness="2"
-                   Fill="#6A6A6A"
-                   RadiusX="10"
-                   RadiusY="10">
+                   StrokeThickness="0.5"
+                   RadiusX="17.5"
+                   RadiusY="17.5">
+            <Rectangle.Fill>
+                <SolidColorBrush Color="#CFCFCF" />
+                <!--
+                <RadialGradientBrush GradientOrigin="0,0" Center="0,0" RadiusX="1" RadiusY="1">
+                    <RadialGradientBrush.GradientStops>
+                        <GradientStop Color="#9F9F9F" Offset="0" />
+                        <GradientStop Color="#404040" Offset="1.5" />
+                    </RadialGradientBrush.GradientStops>
+                </RadialGradientBrush> -->
+            </Rectangle.Fill>
         </Rectangle>
         <TextBlock HorizontalAlignment="Center"
                    VerticalAlignment="Center"

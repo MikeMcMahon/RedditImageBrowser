@@ -39,24 +39,37 @@ namespace RedditReader
             SubredditLabels.Children.Add(label);
             WebClient wc = new WebClient();
             foreach (var listing in listings.data.children) {
-                if (listing.kind.ToLower().Equals("t3") && listing.data.url.ToLower().EndsWith(".jpg")) {
+                if (listing.kind.ToLower().Equals("t3") & 
+                    (listing.data.url.ToLower().EndsWith(".jpg") | listing.data.url.ToLower().EndsWith(".png"))) {
                     thumb = new Thumbnail();
                     thumb.Height = 125;
-                    thumb.Width = 100;
+                    thumb.Width = 110;
                     thumb.ThumbnailBorder = Brushes.Black;
                     thumb.BorderThickness = new Thickness(4, 4, 4, 4);
                     thumb.Margin = new Thickness(10, 10, 10, 0);
                     thumb.ThumbnailText = listing.data.name;
                     thumb.ThumbnailBorderHighlight = Brushes.LightGreen;
-                    wc.DownloadFile(listing.data.thumbnail, @"D:\Development\thumbs\" + listing.data.name + ".jpg");
+                    thumb.MouseLeftButtonDown += thumb_MouseLeftButtonDown;
+                    //wc.DownloadFile(listing.data.thumbnail, @"D:\Development\thumbs\" + listing.data.name + ".jpg");
                     thumb.ThumbnailUrl = listing.data.thumbnail;
                     //@"D:\Development\thumbs\" + listing.data.name + ".jpg";
                     Thumbnails.Children.Add(thumb);
                 }
             }
 
-            //Configuration config = new Configuration();
-            //config.Show();
+            Configuration config = new Configuration();
+            config.Show();
+        }
+
+        void thumb_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            Thumbnail thumb = (Thumbnail)sender;
+            thumb.Selected = true;
+            foreach (Thumbnail elem in Thumbnails.Children.Cast<Thumbnail>())
+            {
+                if (!thumb.ThumbnailText.Equals(elem.ThumbnailText))
+                    elem.Selected = false;
+            }
         }
     }
 }
