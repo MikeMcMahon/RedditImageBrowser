@@ -1,4 +1,5 @@
 ﻿using RedditReader.Json;
+using RedditReader.Net;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -37,10 +38,12 @@ namespace RedditReader
             label.Width = 150;
             label.Margin = new Thickness(0, 10, 0, 10);
             SubredditLabels.Children.Add(label);
-            WebClient wc = new WebClient();
+            DownloadManager dm = new DownloadManager(2);
+            dm.Start();
             foreach (var listing in listings.data.children) {
                 if (listing.kind.ToLower().Equals("t3") & 
-                    (listing.data.url.ToLower().EndsWith(".jpg") | listing.data.url.ToLower().EndsWith(".png"))) {
+                    (listing.data.url.ToLower().EndsWith(".jpg") | listing.data.url.ToLower().EndsWith(".png") |
+                    listing.data.url.ToLower().EndsWith(".jpeg"))) {
                     thumb = new Thumbnail();
                     thumb.Height = 125;
                     thumb.Width = 110;
@@ -50,15 +53,16 @@ namespace RedditReader
                     thumb.ThumbnailText = listing.data.name;
                     thumb.ThumbnailBorderHighlight = Brushes.LightGreen;
                     thumb.MouseLeftButtonDown += thumb_MouseLeftButtonDown;
-                    //wc.DownloadFile(listing.data.thumbnail, @"D:\Development\thumbs\" + listing.data.name + ".jpg");
+                    dm.AddDownload(new Uri(listing.data.url), @"D:\Development\thumbs\" + listing.data.name + ".jpg");
+
                     thumb.ThumbnailUrl = listing.data.thumbnail;
                     //@"D:\Development\thumbs\" + listing.data.name + ".jpg";
                     Thumbnails.Children.Add(thumb);
                 }
             }
 
-            Configuration config = new Configuration();
-            config.Show();
+            //Configuration config = new Configuration();
+            //config.Show();
         }
 
         void thumb_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)

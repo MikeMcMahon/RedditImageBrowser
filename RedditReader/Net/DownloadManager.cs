@@ -12,7 +12,18 @@ namespace RedditReader.Net
     {
         public struct Download
         {
+            public Download(Uri url, string dest)
+            {
+                this.URL = url;
+                this.Destination = dest;
+            }
+
+            /// <summary>
+            /// The URL to download
+            /// </summary>
             public Uri URL;
+
+            // The destination to place the file
             public string Destination;
         }
 
@@ -23,7 +34,7 @@ namespace RedditReader.Net
         private System.Net.WebClient downloader; 
         private Timer timer;
 
-        public DownloadManager(int concurrent = 2, double interval = 500)
+        public DownloadManager(int concurrent = 2, double interval = 100)
         {
             downloader = new System.Net.WebClient();
             downloader.DownloadFileCompleted += downloader_DownloadFileCompleted;
@@ -40,7 +51,7 @@ namespace RedditReader.Net
 
         void downloader_DownloadFileCompleted(object sender, System.ComponentModel.AsyncCompletedEventArgs e)
         {
-            
+            System.Threading.Interlocked.Add(ref current, -1);
         }
 
         void timer_Elapsed(object sender, ElapsedEventArgs e)
@@ -60,14 +71,16 @@ namespace RedditReader.Net
                             }
                         }
                     };
+
+                action.Invoke();
             }
         }
 
 
-
-        public void AddDownload(Download dl)
+        public void AddDownload(Uri url, String destination)
         {
-            downloads.Enqueue(dl);
+            downloads.Enqueue(new Download(url, destination));
+
         }
 
         public bool IsRunning()
