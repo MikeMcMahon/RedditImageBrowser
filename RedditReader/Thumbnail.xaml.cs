@@ -105,5 +105,27 @@ namespace RedditReader
             get { return (string)GetValue(ThumbnailUrlProperty); }
             set { SetValue(ThumbnailUrlProperty, value); }
         }
+
+        public Details ImageDetails { get; protected set; }
+        public void SetDetails(string title, int score, int ups, int downs, string permalink)
+        {
+            ImageDetails = new Details(title, score, ups, downs, permalink);
+        }
+
+        public struct Details
+        {
+            public string Title;
+            public int Score;
+            public int Ups;
+            public int Downs;
+            public string Permalink;
+            public Details(string title, int score, int ups, int downs, string permalink) {
+                this.Title = title;
+                this.Score = score;
+                this.Ups = ups;
+                this.Downs = downs;
+                this.Permalink = permalink;
+            }
+        }
     }
 }

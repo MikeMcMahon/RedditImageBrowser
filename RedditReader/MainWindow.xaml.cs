@@ -38,7 +38,7 @@ namespace RedditReader
             label.Width = 150;
             label.Margin = new Thickness(0, 10, 0, 10);
             SubredditLabels.Children.Add(label);
-            DownloadManager dm = new DownloadManager(2);
+            DownloadManager dm = new DownloadManager(10);
             dm.Start();
             foreach (var listing in listings.data.children) {
                 if (listing.kind.ToLower().Equals("t3") & 
@@ -53,7 +53,15 @@ namespace RedditReader
                     thumb.ThumbnailText = listing.data.name;
                     thumb.ThumbnailBorderHighlight = Brushes.LightGreen;
                     thumb.MouseLeftButtonDown += thumb_MouseLeftButtonDown;
-                    dm.AddDownload(new Uri(listing.data.url), @"D:\Development\thumbs\" + listing.data.name + ".jpg");
+                    thumb.SetDetails(
+                        listing.data.title, 
+                        listing.data.score, 
+                        listing.data.ups, 
+                        listing.data.downs, 
+                        listing.data.permalink
+                    );
+                    
+                    dm.AddDownload(new Uri(listing.data.thumbnail), @"D:\Development\thumbs\" + listing.data.name + ".jpg");
 
                     thumb.ThumbnailUrl = listing.data.thumbnail;
                     //@"D:\Development\thumbs\" + listing.data.name + ".jpg";
@@ -64,11 +72,24 @@ namespace RedditReader
             //Configuration config = new Configuration();
             //config.Show();
         }
-
+        BitmapImage img = null;
         void thumb_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             Thumbnail thumb = (Thumbnail)sender;
-            thumb.Selected = true;
+            if (thumb.Selected)
+                thumb.Selected = false;
+            else
+                thumb.Selected = true;
+
+            if (img != null)
+                img = null;
+
+            img = new BitmapImage();
+            img.BeginInit();
+            img.UriSource = new Uri(@"D:\Development\thumbs\" + thumb.ThumbnailText + ".jpg");
+            img.DecodePixelWidth = 500;
+            img.EndInit();
+            Preview.Source = img;
             foreach (Thumbnail elem in Thumbnails.Children.Cast<Thumbnail>())
             {
                 if (!thumb.ThumbnailText.Equals(elem.ThumbnailText))

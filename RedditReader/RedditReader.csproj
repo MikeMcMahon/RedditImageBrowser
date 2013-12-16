@@ -68,6 +68,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Common\Config.cs" />
     <Compile Include="Json\Listing.cs" />
     <Compile Include="Net\DownloadManager.cs" />
     <Compile Include="RedditAPI.cs" />
@@ -140,7 +141,10 @@
   <ItemGroup>
     <Resource Include="Assets\Loading.png" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Resource Include="Assets\Missing.png" />
+    <Resource Include="Assets\Multiple.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
