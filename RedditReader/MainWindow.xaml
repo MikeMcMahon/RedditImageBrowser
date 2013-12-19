@@ -92,6 +92,13 @@
 
                     </WrapPanel>
                 </ScrollViewer>
+                <WrapPanel Grid.Column="0"
+                           VerticalAlignment="Bottom"
+                           HorizontalAlignment="Right"
+                           Orientation="Horizontal">
+                    <Button Content="Add Subreddit">
+                    </Button>
+                </WrapPanel>
                 <ScrollViewer Grid.Column="1"
                               HorizontalScrollBarVisibility="Disabled"
                               VerticalScrollBarVisibility="Auto">

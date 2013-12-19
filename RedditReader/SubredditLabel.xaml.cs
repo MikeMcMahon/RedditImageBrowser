@@ -33,5 +33,14 @@ namespace RedditReader
             get { return (string)GetValue(TextProperty); }
             set { SetValue(TextProperty, value); }
         }
+
+        private void Rectangle_MouseEnter(object sender, MouseEventArgs e)
+        {
+            ((Rectangle)sender).Fill = Brushes.Gray;
+        }
+        private void Rectangle_MouseLeave(object sender, MouseEventArgs e)
+        {
+            ((Rectangle)sender).Fill = Brushes.Black;
+        }
     }
 }

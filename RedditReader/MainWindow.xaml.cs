@@ -84,12 +84,12 @@ namespace RedditReader
             if (img != null)
                 img = null;
 
-            img = new BitmapImage();
+            /*img = new BitmapImage();
             img.BeginInit();
             img.UriSource = new Uri(@"D:\Development\thumbs\" + thumb.ThumbnailText + ".jpg");
             img.DecodePixelWidth = 500;
             img.EndInit();
-            Preview.Source = img;
+            Preview.Source = img;/**/
             foreach (Thumbnail elem in Thumbnails.Children.Cast<Thumbnail>())
             {
                 if (!thumb.ThumbnailText.Equals(elem.ThumbnailText))
