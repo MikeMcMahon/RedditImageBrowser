@@ -34,9 +34,6 @@ namespace RedditReader
 
             label = new SubredditLabel();
             label.Text = "/r/" + listings.data.children[0].data.subreddit;
-            label.Height = 35;
-            label.Width = 150;
-            label.Margin = new Thickness(0, 10, 0, 10);
             SubredditLabels.Children.Add(label);
             DownloadManager dm = new DownloadManager(10);
             dm.Start();
@@ -94,6 +91,27 @@ namespace RedditReader
             {
                 if (!thumb.ThumbnailText.Equals(elem.ThumbnailText))
                     elem.Selected = false;
+            }
+        }
+
+        private void AddSubReddit_Click(object sender, RoutedEventArgs e)
+        {
+            AddSubReddit dlg = new AddSubReddit();
+            dlg.ShowDialog();
+            if (dlg.DialogResult == true)
+            {
+                bool exists = false;
+                this.SubredditLabels.Children.Cast<UIElement>().ToList<UIElement>().ForEach(lbl =>
+                {
+                    if (((SubredditLabel)lbl).Text.ToLower().Equals(dlg.SubRedditText.Text.ToLower()))
+                        exists = true;
+                });
+                if (!exists)
+                {
+                    SubredditLabel lbl = new SubredditLabel();
+                    lbl.Text = dlg.SubRedditText.Text;
+                    this.SubredditLabels.Children.Add(lbl);
+                }
             }
         }
     }

@@ -5,8 +5,10 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:local="clr-namespace:RedditReader"
              mc:Ignorable="d" 
-             d:DesignHeight="35" d:DesignWidth="175">
-    <Grid>
+             d:DesignHeight="55" d:DesignWidth="150">
+    <Grid Height="35"
+          Width="150"
+          Margin="0,10,0,10">
         <Rectangle VerticalAlignment="Stretch"
                    HorizontalAlignment="Stretch"
                    Stroke="#404040"

@@ -96,7 +96,7 @@
                            VerticalAlignment="Bottom"
                            HorizontalAlignment="Right"
                            Orientation="Horizontal">
-                    <Button Content="Add Subreddit">
+                    <Button Content="Add Subreddit" Click="AddSubReddit_Click">
                     </Button>
                 </WrapPanel>
                 <ScrollViewer Grid.Column="1"
