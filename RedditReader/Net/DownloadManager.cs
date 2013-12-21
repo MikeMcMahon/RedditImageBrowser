@@ -10,28 +10,11 @@ namespace RedditReader.Net
 {
     class DownloadManager : IDisposable
     {
-        public struct Download
-        {
-            public Download(Uri url, string dest)
-            {
-                this.URL = url;
-                this.Destination = dest;
-            }
-
-            /// <summary>
-            /// The URL to download
-            /// </summary>
-            public Uri URL;
-
-            // The destination to place the file
-            public string Destination;
-        }
-
         private ConcurrentQueue<Download> downloads = new ConcurrentQueue<Download>();
         private static int max_concurrent;
         private static int current = 0;
-        private bool status = false;
-        private List<System.Net.WebClient> downloader; 
+        private bool running = false;
+        private List<System.Net.WebClient> downloader;
         private Timer timer;
 
         public DownloadManager(int concurrent = 2, double interval = 100)
@@ -52,7 +35,30 @@ namespace RedditReader.Net
             for (int i = 0; i < max_concurrent; i++) {
                 downloader.Add(new System.Net.WebClient());
                 downloader[i].DownloadFileCompleted += DownloadFileCompleted;
-                downloader[i].DownloadProgressChanged += DownloadProgressChanged;
+            }
+        }
+
+        void DownloadFileCompleted(object sender, System.ComponentModel.AsyncCompletedEventArgs e)
+        {
+            System.Threading.Interlocked.Add(ref current, -1);
+        }
+
+        void DispatchDownload(object sender, ElapsedEventArgs e)
+        {
+            if (IsRunning()) {
+                Action action = () =>
+                    {
+                        if (current < max_concurrent) {
+                            System.Threading.Interlocked.Add(ref current, 1);
+                            Download download;
+                            if (downloads.TryDequeue(out download)) {
+                                // Try to download the file
+                                DispatchToFirstAvailable(download);
+                            }
+                        }
+                    };
+
+                action.Invoke();
             }
         }
 
@@ -64,66 +70,73 @@ namespace RedditReader.Net
         {
             foreach (var dl in downloader) {
                 if (!dl.IsBusy) {
+                    // Create an assign a handler for relaying the dl is complete that will uregister the handler once it is complete
+                    System.ComponentModel.AsyncCompletedEventHandler handler = null;
+                    handler = delegate(object sender, System.ComponentModel.AsyncCompletedEventArgs e)
+                    {
+                        this.DownloadComplete(this, new DownloadCompleteArgs(download.Id));
+                        (sender as System.Net.WebClient).DownloadFileCompleted -= handler;
+                    };
+
+                    dl.DownloadFileCompleted += handler;
                     dl.DownloadFileAsync(download.URL, download.Destination);
                     break;
                 }
             }
         }
 
-        void DownloadProgressChanged(object sender, System.Net.DownloadProgressChangedEventArgs e)
+        public void AddDownload(String id, Uri url, String destination)
         {
-            
+            downloads.Enqueue(new Download(url, destination, id));
+
         }
 
-        void DownloadFileCompleted(object sender, System.ComponentModel.AsyncCompletedEventArgs e)
-        {
-            System.Threading.Interlocked.Add(ref current, -1);
-        }
-
-        void DispatchDownload(object sender, ElapsedEventArgs e)
-        {
-            if (IsRunning())
-            {
-                Action action = () =>
-                    {
-                        if (current < max_concurrent)
-                        {
-                            System.Threading.Interlocked.Add(ref current, 1);
-                            Download download;
-                            if (downloads.TryDequeue(out download))
-                            {
-                                // Try to download the file
-                                DispatchToFirstAvailable(download);
-                            }
-                        }
-                    };
-
-                action.Invoke();
-            }
-        }
-
-
-        public void AddDownload(Uri url, String destination)
-        {
-            downloads.Enqueue(new Download(url, destination));
-
-        }
-        
-        //
+        /// <summary>
+        /// Checks to determine if the system has been started or is running
+        /// </summary>
+        /// <returns></returns>
         public bool IsRunning()
         {
-            return status;
+            if (running)
+                return true;
+            if (DownloaderBusy())
+                return true;
+
+            return false;
         }
-        public void Start() {
-            status = true;
+
+        /// <summary>
+        /// Checks allocated download slots to determine if the downloader is in a busy or active state
+        /// </summary>
+        /// <returns></returns>
+        public bool DownloaderBusy()
+        {
+            foreach (var dl in downloader) {
+                if (dl.IsBusy)
+                    return true;
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Starts the downloader and begins downloading files
+        /// </summary>
+        public void Start()
+        {
+            running = true;
             timer.Start();
         }
-        public void Stop() {
-            status = false;
+
+        /// <summary>
+        /// Stops the downloader (NOT A PAUSE)
+        /// </summary>
+        public void Stop()
+        {
+            running = false;
             timer.Stop();
         }
 
-        #region Download Complete
+        #region DownloadEvents
         public class DownloadCompleteArgs : EventArgs
         {
             public string Id;
@@ -132,7 +145,35 @@ namespace RedditReader.Net
                 this.Id = Id;
             }
         }
-        public EventHandler<DownloadCompleteArgs> DownloadComplete;
+
+        public class DownloadProgressChangedArgs : EventArgs
+        {
+            public string Id;
+            public int TotalBytesReceived;
+            public int TotalBytesExpected;
+
+            public DownloadProgressChangedArgs(string id, int totalreceived, int totalexpected)
+            {
+                Id = id;
+                TotalBytesReceived = totalreceived;
+                TotalBytesExpected = totalexpected;
+            }
+        }
+
+        /// <summary>
+        /// Fires when the progress for a download changes
+        /// </summary>
+        public event EventHandler<DownloadProgressChangedArgs> DownloadProgressChanged;
+        public virtual void OnDownloadProgressChanged(DownloadProgressChangedArgs e)
+        {
+            if (DownloadProgressChanged != null)
+                DownloadProgressChanged(this, e);
+        }
+
+        /// <summary>
+        /// Fires when a download is complete 
+        /// </summary>
+        public event EventHandler<DownloadCompleteArgs> DownloadComplete;
         public virtual void OnDownloadComplete(DownloadCompleteArgs e)
         {
             if (DownloadComplete != null)
@@ -148,7 +189,6 @@ namespace RedditReader.Net
             this.Stop();
             bool isBusy = false;
             do {
-                this.Stop();
                 isBusy = false;
 
                 downloader.ForEach(dl =>
@@ -158,7 +198,32 @@ namespace RedditReader.Net
                     else
                         dl.Dispose();
                 });
-            }  while (isBusy);
+            } while (isBusy);
+        }
+        
+        public struct Download
+        {
+            public Download(Uri url, string dest, string id)
+            {
+                this.URL = url;
+                this.Destination = dest;
+                this.Id = id;
+            }
+
+            /// <summary>
+            /// The URL to download
+            /// </summary>
+            public Uri URL;
+
+            /// <summary>
+            /// The destination to place the file
+            /// </summary>
+            public string Destination;
+
+            /// <summary>
+            /// The id to track this download
+            /// </summary>
+            public string Id;
         }
     }
 }
