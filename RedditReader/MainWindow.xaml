@@ -83,22 +83,35 @@
                     <ColumnDefinition Width="25*" />
                     <ColumnDefinition Width="75*" />
                 </Grid.ColumnDefinitions>
-                <ScrollViewer Grid.Column="0"
+                <Grid Grid.Column="0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="60" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <Button Grid.Row="0"
+                        HorizontalAlignment="Left"
+                        VerticalAlignment="Top"
+                        Content="Remove Subreddit" 
+                        Click="RemoveSubReddit_Click" 
+                        Style="{StaticResource SubRedditLabelRemove}" 
+                        Margin="10,10,10,10"/>
+                    <Button Grid.Row="0"
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Top"
+                        Content="Add Subreddit" 
+                        Click="AddSubReddit_Click" 
+                        Style="{StaticResource SubRedditLabelAdd}" 
+                        Margin="10,10,10,10"/>
+                    <ScrollViewer Grid.Row="1"
                               HorizontalScrollBarVisibility="Disabled"
                               VerticalScrollBarVisibility="Auto">
-                    <WrapPanel x:Name="SubredditLabels"
+                        <WrapPanel x:Name="SubredditLabels"
                                Orientation="Vertical"
                                HorizontalAlignment="Center">
 
-                    </WrapPanel>
-                </ScrollViewer>
-                <WrapPanel Grid.Column="0"
-                           VerticalAlignment="Bottom"
-                           HorizontalAlignment="Right"
-                           Orientation="Horizontal">
-                    <Button Content="Add Subreddit" Click="AddSubReddit_Click">
-                    </Button>
-                </WrapPanel>
+                        </WrapPanel>
+                    </ScrollViewer>
+                </Grid>
                 <ScrollViewer Grid.Column="1"
                               HorizontalScrollBarVisibility="Disabled"
                               VerticalScrollBarVisibility="Auto">

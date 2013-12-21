@@ -30,20 +30,13 @@
               Width="15"
               HorizontalAlignment="Right"
               VerticalAlignment="Top">
-            <Rectangle x:Name="Exit"
-                       Height="15"
-                       Width="15"
-                       RadiusX="7.5"
-                       RadiusY="7.5"
-                       Fill="Black"
-                       Stroke="White"
-                       StrokeThickness=".5"
-                       MouseEnter="Rectangle_MouseEnter"
-                       MouseLeave="Rectangle_MouseLeave"
-                       >
-            </Rectangle>
-            <Polyline Points="4,4 11,11" Stroke="White" StrokeThickness="1" StrokeEndLineCap="Round" StrokeStartLineCap="Round" />
-            <Polyline Points="11,4 4,11" Stroke="White" StrokeThickness="1" StrokeEndLineCap="Round" StrokeStartLineCap="Round" />
+            
+            <Button x:Name="Remove" 
+                    Height="15"
+                    Width="15"
+                    Style="{StaticResource SubRedditLabelRemoveSub}"
+                    >
+            </Button>
         </Grid>
         <TextBlock HorizontalAlignment="Center"
                    VerticalAlignment="Center"

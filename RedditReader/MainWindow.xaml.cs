@@ -94,6 +94,14 @@ namespace RedditReader
             }
         }
 
+        private void RemoveSubReddit_Click(object sender, RoutedEventArgs e)
+        {
+            foreach (UIElement child in this.SubredditLabels.Children)
+            {
+                // TODO - Check if it is selected, if it is REMOVE IT!
+            }
+        }
+
         private void AddSubReddit_Click(object sender, RoutedEventArgs e)
         {
             AddSubReddit dlg = new AddSubReddit();
