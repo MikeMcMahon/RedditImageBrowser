@@ -2,9 +2,9 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Configuration"
-        Height="160"
+        Height="165"
         Width="538"
-        ResizeMode="NoResize">
+        ResizeMode="NoResize" SizeToContent="Height">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="33" />
@@ -56,40 +56,20 @@
         <StackPanel Grid.Column="0"
                     Grid.Row="1"
                     HorizontalAlignment="Right">
-            <TextBlock Text="Username"
-                       HorizontalAlignment="Right"
-                       FontSize="18"
-                       Foreground="White"
-                       Margin="10,0,0,1 "/>
-            <TextBlock Text="Password"
-                       HorizontalAlignment="Right"
-                       FontSize="18"
-                       Foreground="White"
-                       Margin="10,0,0,1 " />
-            <TextBlock Text="Downloads"
-                       HorizontalAlignment="Right"
-                       FontSize="18"
-                       Foreground="White"
-                       Margin="10,0,0,1 " />
+            <TextBlock Text="Username" Style="{StaticResource ConfigurationLabel}"/>
+            <TextBlock Text="Password" Style="{StaticResource ConfigurationLabel}"/>
+            <TextBlock Text="Downloads" Style="{StaticResource ConfigurationLabel}"/>
+            <TextBlock Text="Reddit Pages" Style="{StaticResource ConfigurationLabel}"/>
         </StackPanel>
         <StackPanel Grid.Column="1"
                     Grid.Row="1"
                     HorizontalAlignment="Left">
-            <TextBox Text=""
-                     HorizontalAlignment="Left"
-                     FontSize="16"
-                     Width="150"
-                     Margin="10,0,0,1" />
-            <PasswordBox FontSize="16"
-                         HorizontalAlignment="Left"
-                         Width="150"
-                         Margin="10,0,0,1" />
+            <TextBox Text="" Style="{StaticResource ConfigurationInput}" />
+            <PasswordBox Style="{StaticResource PasswordInput}" />
             <WrapPanel>
                 <TextBox Text=""
-                         HorizontalAlignment="Left"
-                         FontSize="16"
-                         Width="300"
-                         Margin="10,0,0,1" />
+                         Style="{StaticResource ConfigurationInput}"
+                         Width="300" />
                 <Button
                         FontFamily="Segoe UI Symbol"
                         Background="Transparent"
@@ -121,6 +101,7 @@
                     </Button.Margin>
                 </Button>
             </WrapPanel>
+            <TextBox x:Name="RedditPages" Style="{StaticResource ConfigurationInput}" />
         </StackPanel>
     </Grid>
 </Window>

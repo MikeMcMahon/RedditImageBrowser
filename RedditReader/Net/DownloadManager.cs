@@ -109,7 +109,6 @@ namespace RedditReader.Net
 
         }
         
-        //
         public bool IsRunning()
         {
             return status;

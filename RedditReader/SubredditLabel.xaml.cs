@@ -23,6 +23,12 @@ namespace RedditReader
         public SubredditLabel()
         {
             InitializeComponent();
+            Remove.Click += Remove_Click;
+        }
+
+        void Remove_Click(object sender, RoutedEventArgs e)
+        {
+            RemoveClicked(this, new RemoveClickedEventArgs());
         }
 
         public static readonly DependencyProperty TextProperty =
@@ -33,5 +39,18 @@ namespace RedditReader
             get { return (string)GetValue(TextProperty); }
             set { SetValue(TextProperty, value); }
         }
+
+        #region RemoveEvent
+        public event EventHandler<RemoveClickedEventArgs> RemoveClicked;
+        public virtual void OnRemoveClicked(RemoveClickedEventArgs e)
+        {
+            if (RemoveClicked != null)
+                RemoveClicked(this, e);
+        }
+        public class RemoveClickedEventArgs : EventArgs
+        {
+            public RemoveClickedEventArgs() { }
+        }
+        #endregion
     }
 }

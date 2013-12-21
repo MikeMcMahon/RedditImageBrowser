@@ -5,8 +5,8 @@
     <Grid>
         <StackPanel Orientation="Horizontal">
         <TextBox x:Name="SubRedditText"
-                 HorizontalAlignment="Left"
-                 VerticalAlignment="Top"
+                 HorizontalAlignment="Stretch"
+                 VerticalAlignment="Stretch"
                  Width="200"
                  TextChanged="SubRedditText_TextChanged"
                  TextInput="SubRedditText_TextInput"

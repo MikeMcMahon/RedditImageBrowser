@@ -34,6 +34,7 @@ namespace RedditReader
 
             label = new SubredditLabel();
             label.Text = "/r/" + listings.data.children[0].data.subreddit;
+            label.RemoveClicked += label_RemoveClicked;
             SubredditLabels.Children.Add(label);
             DownloadManager dm = new DownloadManager(10);
             dm.Start();
@@ -69,6 +70,12 @@ namespace RedditReader
             //Configuration config = new Configuration();
             //config.Show();
         }
+
+        void label_RemoveClicked(object sender, SubredditLabel.RemoveClickedEventArgs e)
+        {
+            this.SubredditLabels.Children.Remove(((UIElement)sender));
+        }
+
         BitmapImage img = null;
         void thumb_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
@@ -94,14 +101,6 @@ namespace RedditReader
             }
         }
 
-        private void RemoveSubReddit_Click(object sender, RoutedEventArgs e)
-        {
-            foreach (UIElement child in this.SubredditLabels.Children)
-            {
-                // TODO - Check if it is selected, if it is REMOVE IT!
-            }
-        }
-
         private void AddSubReddit_Click(object sender, RoutedEventArgs e)
         {
             AddSubReddit dlg = new AddSubReddit();
@@ -118,6 +117,7 @@ namespace RedditReader
                 {
                     SubredditLabel lbl = new SubredditLabel();
                     lbl.Text = dlg.SubRedditText.Text;
+                    lbl.RemoveClicked += label_RemoveClicked;
                     this.SubredditLabels.Children.Add(lbl);
                 }
             }

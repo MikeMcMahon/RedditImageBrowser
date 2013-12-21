@@ -42,8 +42,8 @@
         <Grid DockPanel.Dock="Left"
               Background="Gray">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="70*" />
-                <ColumnDefinition Width="30*" />
+                <ColumnDefinition Width="80*" />
+                <ColumnDefinition Width="20*" />
             </Grid.ColumnDefinitions>
             <Rectangle Grid.Column="0"
                        HorizontalAlignment="Stretch"
@@ -88,13 +88,6 @@
                         <RowDefinition Height="60" />
                         <RowDefinition Height="*" />
                     </Grid.RowDefinitions>
-                    <Button Grid.Row="0"
-                        HorizontalAlignment="Left"
-                        VerticalAlignment="Top"
-                        Content="Remove Subreddit" 
-                        Click="RemoveSubReddit_Click" 
-                        Style="{StaticResource SubRedditLabelRemove}" 
-                        Margin="10,10,10,10"/>
                     <Button Grid.Row="0"
                         HorizontalAlignment="Right"
                         VerticalAlignment="Top"
