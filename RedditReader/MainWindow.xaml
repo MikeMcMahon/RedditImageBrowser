@@ -42,8 +42,8 @@
         <Grid DockPanel.Dock="Left"
               Background="Gray">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="70*" />
-                <ColumnDefinition Width="30*" />
+                <ColumnDefinition Width="80*" />
+                <ColumnDefinition Width="20*" />
             </Grid.ColumnDefinitions>
             <Rectangle Grid.Column="0"
                        HorizontalAlignment="Stretch"
@@ -83,15 +83,28 @@
                     <ColumnDefinition Width="25*" />
                     <ColumnDefinition Width="75*" />
                 </Grid.ColumnDefinitions>
-                <ScrollViewer Grid.Column="0"
+                <Grid Grid.Column="0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="60" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <Button Grid.Row="0"
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Top"
+                        Content="Add Subreddit" 
+                        Click="AddSubReddit_Click" 
+                        Style="{StaticResource SubRedditLabelAdd}" 
+                        Margin="10,10,10,10"/>
+                    <ScrollViewer Grid.Row="1"
                               HorizontalScrollBarVisibility="Disabled"
                               VerticalScrollBarVisibility="Auto">
-                    <WrapPanel x:Name="SubredditLabels"
+                        <WrapPanel x:Name="SubredditLabels"
                                Orientation="Vertical"
                                HorizontalAlignment="Center">
 
-                    </WrapPanel>
-                </ScrollViewer>
+                        </WrapPanel>
+                    </ScrollViewer>
+                </Grid>
                 <ScrollViewer Grid.Column="1"
                               HorizontalScrollBarVisibility="Disabled"
                               VerticalScrollBarVisibility="Auto">

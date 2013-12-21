@@ -22,5 +22,7 @@ namespace RedditReader.Common
                 set { _Thumbnails = value; }
             }
         }
+
+        public readonly string[] supported_file_formats = { ".jpeg", ".jpg", ".bmp", ".png" };
     }
 }
