@@ -1,4 +1,5 @@
-﻿using RedditReader.Json;
+﻿using RedditReader.Common;
+using RedditReader.Json;
 using RedditReader.Net;
 using System;
 using System.Collections.Generic;
@@ -27,6 +28,10 @@ namespace RedditReader
         {
             InitializeComponent();
 
+            /*Config c = new Config();
+            c.AppConfig.password = "PASSWORD";
+            c.Save();/**/
+
             SubredditLabel label;
             Thumbnail thumb;
             RedditAPI api = new RedditAPI();
@@ -36,7 +41,7 @@ namespace RedditReader
             label.Text = "/r/" + listings.data.children[0].data.subreddit;
             label.RemoveClicked += label_RemoveClicked;
             SubredditLabels.Children.Add(label);
-            DownloadManager dm = new DownloadManager(10);
+            DownloadManager dm = new DownloadManager(interval:500);
             dm.Start();
             foreach (var listing in listings.data.children) {
                 if (listing.kind.ToLower().Equals("t3") & 
@@ -59,7 +64,7 @@ namespace RedditReader
                         listing.data.permalink
                     );
                     
-                    dm.AddDownload(new Uri(listing.data.thumbnail), @"D:\Development\thumbs\" + listing.data.name + ".jpg");
+                    dm.AddDownload(listing.data.name, new Uri(listing.data.url), @"D:\Development\thumbs\" + listing.data.name + ".jpg");
 
                     thumb.ThumbnailUrl = listing.data.thumbnail;
                     //@"D:\Development\thumbs\" + listing.data.name + ".jpg";
@@ -121,6 +126,12 @@ namespace RedditReader
                     this.SubredditLabels.Children.Add(lbl);
                 }
             }
+        }
+
+        private void OpenConfiguration(object sender, RoutedEventArgs e)
+        {
+            Configuration config = new Configuration();
+            config.ShowDialog();
         }
     }
 }

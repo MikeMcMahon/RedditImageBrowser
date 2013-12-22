@@ -4,6 +4,7 @@
         Title="Reddit Backgrounds"
         Height="720"
         Width="1000"
+        DataContext="{StaticResource ConfigDataSource}"
         ResizeMode="CanResizeWithGrip">
     <DockPanel>
         <StatusBar DockPanel.Dock="Bottom">
@@ -36,7 +37,7 @@
               DockPanel.Dock="Top">
             <MenuItem Header="File" />
             <MenuItem Header="Settings">
-                <MenuItem Header="Configuration" />
+                <MenuItem Header="Configuration" Click="OpenConfiguration" />
             </MenuItem>
         </Menu>
         <Grid DockPanel.Dock="Left"

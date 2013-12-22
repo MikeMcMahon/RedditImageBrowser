@@ -74,7 +74,7 @@ namespace RedditReader.Net
                     System.ComponentModel.AsyncCompletedEventHandler handler = null;
                     handler = delegate(object sender, System.ComponentModel.AsyncCompletedEventArgs e)
                     {
-                        this.DownloadComplete(this, new DownloadCompleteArgs(download.Id));
+                        this.OnDownloadComplete(new DownloadCompleteArgs(download.Id));
                         (sender as System.Net.WebClient).DownloadFileCompleted -= handler;
                     };
 

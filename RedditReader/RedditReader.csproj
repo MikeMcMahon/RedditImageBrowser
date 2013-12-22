@@ -50,6 +50,7 @@
     <Reference Include="System.Net" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Net.Http.WebRequest" />
+    <Reference Include="System.Security" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
@@ -69,7 +70,10 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Common\Config.cs" />
+    <Compile Include="Json\AppConfig.cs" />
+    <Compile Include="Json\BindableBase.cs" />
     <Compile Include="Json\Listing.cs" />
+    <Compile Include="Json\SubReddits.cs" />
     <Compile Include="Net\DownloadManager.cs" />
     <Compile Include="RedditAPI.cs" />
     <Compile Include="SubredditLabel.xaml.cs">
