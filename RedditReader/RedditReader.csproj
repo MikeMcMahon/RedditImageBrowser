@@ -33,6 +33,9 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>reddit.ico</ApplicationIcon>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="DotNetAuth">
       <HintPath>..\packages\DotNetAuth.1.0.5\lib\net40\DotNetAuth.dll</HintPath>
@@ -70,10 +73,13 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Common\Config.cs" />
+    <Compile Include="DataSource\SubredditContent.cs" />
     <Compile Include="Json\AppConfig.cs" />
-    <Compile Include="Json\BindableBase.cs" />
+    <Compile Include="Common\BindableBase.cs" />
     <Compile Include="Json\Listing.cs" />
-    <Compile Include="Json\SubReddits.cs" />
+    <Compile Include="Json\SubredditDetail.cs" />
+    <Compile Include="Json\SubredditSearch.cs" />
+    <Compile Include="Json\Subreddits.cs" />
     <Compile Include="Net\DownloadManager.cs" />
     <Compile Include="RedditAPI.cs" />
     <Compile Include="SubredditLabel.xaml.cs">
@@ -155,6 +161,9 @@
   <ItemGroup>
     <Resource Include="Assets\Missing.png" />
     <Resource Include="Assets\Multiple.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="reddit.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

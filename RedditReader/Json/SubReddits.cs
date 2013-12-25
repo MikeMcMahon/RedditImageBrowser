@@ -1,21 +1,25 @@
-﻿using System;
+﻿using RedditReader.Common;
+using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace RedditReader.Json
 {
-    class SubReddits
+    public class Subscribed : BindableBase
     {
-        public List<Subscribed> items { get; set; }
+        public string id { get; set; }
+        public string description { get; set; }
+        public string name { get; set; }
+        public List<string> downloaded { get; set; }
+    }
 
-        public class Subscribed 
+    class Subreddits : ObservableCollection<Subscribed> // ICollection<Subscribed>
+    {
+        public Subreddits()
         {
-            public string subreddit_id { get; set; }
-            public string description { get; set; }
-            public string subreddit_name { get; set; }
-            public List<string> downloaded { get; set; }
         }
     }
 }

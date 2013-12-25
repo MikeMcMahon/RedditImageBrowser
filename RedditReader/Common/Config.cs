@@ -18,11 +18,26 @@ namespace RedditReader.Common
         private static readonly string default_config_dir = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
         private static readonly int max_pages = 2;
         private static readonly string default_img_dir = "Reddit";
-        private static readonly string default_download_dir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyPictures), default_img_dir);
+        public static readonly string default_download_dir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyPictures), default_img_dir);
         public static readonly string[] supporfted_file_formats = { ".jpeg", ".jpg", ".bmp", ".png" };
 
         public AppConfig AppConfig { get; protected set; }
-        public SubReddits SubredditsSubscribed { get; protected set; }
+        public Subreddits SubredditsSubscribed { get; set; }
+
+        /// <summary>
+        /// Using the subreddit detail add a new subscription
+        /// </summary>
+        /// <param name="detail"></param>
+        public void AddSubreddit(SubredditDetail detail)
+        {
+            Subscribed newSubscription = new Subscribed();
+            newSubscription.name = "/r/" + detail.data.display_name;
+            newSubscription.id = detail.data.name;
+            newSubscription.description = detail.data.public_description;
+            newSubscription.downloaded = new List<string>();
+
+            SubredditsSubscribed.Add(newSubscription);
+        }
 
         public Config()
         {
@@ -48,11 +63,27 @@ namespace RedditReader.Common
             get { return Path.Combine(default_config_dir, default_subreddits_subscribed); }
         }
 
-        public void Save()
+        /// <summary>
+        /// Saves the subreddit config file
+        /// </summary>
+        public void SaveSubreddits()
         {
-            using (var config_stream = new StreamWriter(File.Open(ConfigFilePath, FileMode.Open, FileAccess.Write, FileShare.ReadWrite)))
+            Save(SubredditsSubscribed, SubredditFilePath);
+        }
+
+        /// <summary>
+        /// Saves the config file
+        /// </summary>
+        public void SaveConfig()
+        {
+            Save(AppConfig, ConfigFilePath);
+        }
+
+        private void Save(Object obj, string path)
+        {
+            using (var config_stream = new StreamWriter(File.Open(path, FileMode.Truncate, FileAccess.Write, FileShare.Read))) 
             {
-                string json = JsonConvert.SerializeObject(AppConfig);
+                string json = JsonConvert.SerializeObject(obj, Formatting.Indented);
                 config_stream.Write(json);
                 config_stream.Flush();
             }
@@ -65,11 +96,11 @@ namespace RedditReader.Common
         public void LoadConfig()
         {
             AppConfig = PopulateJSON<AppConfig>(ConfigFilePath, string.Format(@"{{
-                ""username"":"""",
-                ""password"":"""",
-                ""download_directory"": ""{0}"",
-                ""reddit_pages"": {1}
-            }}",
+    ""username"":"""",
+    ""password"":"""",
+    ""download_directory"": ""{0}"",
+    ""reddit_pages"": {1}
+}}",
               Regex.Replace(default_download_dir, @"(?<!\\)\\(?!\\)", @"\\", RegexOptions.IgnorePatternWhitespace),
               max_pages));
         }
@@ -80,7 +111,14 @@ namespace RedditReader.Common
         /// </summary>
         public void LoadSubreddits()
         {
-            SubredditsSubscribed = PopulateJSON<SubReddits>(SubredditFilePath);
+            SubredditsSubscribed = PopulateJSON<Subreddits>(SubredditFilePath, string.Format(@"[
+{{
+    ""id"":""t5_2sbq3"",
+    ""description"":"""",
+    ""name"":""/r/EarthPorn"",
+    ""downloaded"":""""
+}}
+]"));
         }
 
         /// <summary>
@@ -91,7 +129,7 @@ namespace RedditReader.Common
         /// <returns>A deserialized type of T</returns>
         private T PopulateJSON<T>(string path, string def="{}")
         {
-            using (var config_stream = new StreamReader(File.Open(path, FileMode.Truncate, FileAccess.ReadWrite, FileShare.Read)))
+            using (var config_stream = new StreamReader(File.Open(path, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.Read)))
             {
                 string contents = def;
                 if (!ReadContents(config_stream, ref contents))

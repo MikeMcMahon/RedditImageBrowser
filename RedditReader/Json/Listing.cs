@@ -1,5 +1,7 @@
-﻿using System;
+﻿using RedditReader.Common;
+using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -8,6 +10,15 @@ namespace RedditReader.Json
 {
     class Listing
     {
+        public static bool IsSupportedFormat(Uri url)
+        {
+            foreach (string ext in Config.supporfted_file_formats.ToList<string>()) {
+                if (url.AbsolutePath.ToLower().EndsWith(ext))
+                    return true;
+            }
+
+            return false;
+        }
         public class MediaEmbed
         {
         }
@@ -16,7 +27,7 @@ namespace RedditReader.Json
         {
         }
 
-        public class Data2
+        public class Details
         {
             public string domain { get; set; }
             public object banned_by { get; set; }
@@ -31,7 +42,9 @@ namespace RedditReader.Json
             public SecureMediaEmbed secure_media_embed { get; set; }
             public bool clicked { get; set; }
             public bool stickied { get; set; }
-            public string author { get; set; }
+
+            private string _author;
+            public string author { get { return "/u/" + _author; } set { _author = value; } }
             public object media { get; set; }
             public int score { get; set; }
             public object approved_by { get; set; }
@@ -62,13 +75,14 @@ namespace RedditReader.Json
         public class Child
         {
             public string kind { get; set; }
-            public Data2 data { get; set; }
+            public Details data { get; set; }
         }
 
         public class Data
         {
             public string modhash { get; set; }
-            public List<Child> children { get; set; }
+            public ObservableCollection<Child> children { get; set; }
+            // spublic List<Child> children { get; set; }
             public string after { get; set; }
             public object before { get; set; }
         }

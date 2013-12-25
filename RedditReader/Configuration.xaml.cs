@@ -1,4 +1,5 @@
-﻿using System;
+﻿using RedditReader.Common;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -22,6 +23,30 @@ namespace RedditReader
         public Configuration()
         {
             InitializeComponent();
+        }
+
+        private void SaveAndClose(object sender, RoutedEventArgs e)
+        {
+            this.DialogResult = true;
+            
+            Username.GetBindingExpression(TextBox.TextProperty).UpdateSource();
+            DownloadDir.GetBindingExpression(TextBox.TextProperty).UpdateSource();
+            RedditPages.GetBindingExpression(Slider.ValueProperty).UpdateSource();
+            
+            ((Config)DataContext).SaveConfig();
+            
+            this.Close();
+        }
+
+        private void CancelAndClose(object sender, RoutedEventArgs e)
+        {
+            this.DialogResult = false;
+            this.Close();
+        }
+
+        private void SelectDownloadDirectory(object sender, RoutedEventArgs e)
+        {
+
         }
     }
 }

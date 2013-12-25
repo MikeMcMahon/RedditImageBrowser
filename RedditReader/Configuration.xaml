@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         x:Class="RedditReader.Configuration"
         Title="Configuration"
-        Height="165"
+        Height="203"
         Width="538"
         DataContext="{StaticResource ConfigDataSource}"
         ResizeMode="NoResize" SizeToContent="Height">
@@ -11,6 +11,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="33" />
             <RowDefinition Height="*" />
+            <RowDefinition Height="40" />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="30*" />
@@ -66,17 +67,20 @@
         <StackPanel Grid.Column="1"
 			Grid.Row="1"
 			HorizontalAlignment="Left">
-            <TextBox Text="{Binding AppConfig.username}" Style="{StaticResource ConfigurationInput}" />
+            <TextBox x:Name="Username" x:FieldModifier="private" Text="{Binding AppConfig.username, UpdateSourceTrigger=Explicit}" Style="{StaticResource ConfigurationInput}" />
             <PasswordBox Style="{StaticResource PasswordInput}" />
             <WrapPanel>
-                <TextBox Text="{Binding AppConfig.download_directory}"
-					Style="{StaticResource ConfigurationInput}"
-					Width="300" />
+                <TextBox x:Name="DownloadDir"
+                         x:FieldModifier="private"
+                         Text="{Binding AppConfig.download_directory, UpdateSourceTrigger=Explicit}"
+                         Style="{StaticResource ConfigurationInput}"
+                         Width="300" />
                 <Button
 					FontFamily="Segoe UI Symbol"
 					Background="Transparent"
 					FontSize="12"
-					Foreground="White">
+					Foreground="White"
+                    Click="SelectDownloadDirectory">
                     <Button.Margin>
                         <Thickness Left="10" />
                     </Button.Margin>
@@ -101,7 +105,41 @@
                     </Grid>
                 </Button>
             </WrapPanel>
-            <TextBox x:Name="RedditPages" Style="{StaticResource ConfigurationInput}" SelectionBrush="{Binding AppConfig.reddit_pages}" Text="{Binding AppConfig.reddit_pages}" />
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="75*" />
+                    <ColumnDefinition Width="25*" />
+                </Grid.ColumnDefinitions>
+                <Slider x:Name="RedditPages"
+                        x:FieldModifier="private"
+                        Grid.Column="0"
+                        TickFrequency="1"
+                        IsSnapToTickEnabled="True"
+                        Minimum="1"
+                        Maximum="5"
+                        Value="{Binding AppConfig.reddit_pages, UpdateSourceTrigger=Explicit}" 
+                        Margin="10,0,0,1"/>
+                <TextBlock Text="{Binding Value, ElementName=RedditPages}"
+                           Grid.Column="1"
+                           HorizontalAlignment="Left"
+                           Style="{StaticResource ConfigurationLabel}" />
+            </Grid>
         </StackPanel>
+        <WrapPanel Grid.Column="1"
+                   Grid.Row="2"
+                   HorizontalAlignment="Right"
+                   Orientation="Horizontal"
+                   VerticalAlignment="Stretch"
+                   Height="40">
+            <Button Grid.Column="1"
+                    Grid.Row="2"
+                    Content="Okay"
+                    Click="SaveAndClose" />
+            <Button Grid.Column="1"
+                    Grid.Row="2"
+                    HorizontalAlignment="Left"
+                    Content="Cancel"
+                    Click="CancelAndClose" />
+        </WrapPanel>
     </Grid>
 </Window>

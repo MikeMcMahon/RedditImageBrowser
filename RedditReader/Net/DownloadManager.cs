@@ -26,6 +26,22 @@ namespace RedditReader.Net
         }
 
         /// <summary>
+        /// Like the title says, cancel all of the downloads
+        /// </summary>
+        public void CancelAllDownloads(bool restart=true)
+        {
+            Stop();
+            foreach (var download in downloader) {
+                if (download.IsBusy)
+                    download.CancelAsync();
+            }
+
+            // Just wipe out what we've got
+            downloads = new ConcurrentQueue<Download>();
+            Start();
+        }
+
+        /// <summary>
         /// Builds a list of webclients to use for downloading
         /// </summary>
         private void ConstructDownloaders()
@@ -49,7 +65,6 @@ namespace RedditReader.Net
                 Action action = () =>
                     {
                         if (current < max_concurrent) {
-                            System.Threading.Interlocked.Add(ref current, 1);
                             Download download;
                             if (downloads.TryDequeue(out download)) {
                                 // Try to download the file
@@ -70,15 +85,28 @@ namespace RedditReader.Net
         {
             foreach (var dl in downloader) {
                 if (!dl.IsBusy) {
+                    System.Threading.Interlocked.Add(ref current, 1);
                     // Create an assign a handler for relaying the dl is complete that will uregister the handler once it is complete
-                    System.ComponentModel.AsyncCompletedEventHandler handler = null;
-                    handler = delegate(object sender, System.ComponentModel.AsyncCompletedEventArgs e)
+                    System.ComponentModel.AsyncCompletedEventHandler downloaded = null;
+                    downloaded = delegate(object sender, System.ComponentModel.AsyncCompletedEventArgs e)
                     {
-                        this.OnDownloadComplete(new DownloadCompleteArgs(download.Id));
-                        (sender as System.Net.WebClient).DownloadFileCompleted -= handler;
+                        if (e.Cancelled)
+                            return;
+
+                        this.OnDownloadComplete(new DownloadCompleteArgs(download.Id, download.Destination));
+                        (sender as System.Net.WebClient).DownloadFileCompleted -= downloaded;
+                    };
+                    System.Net.DownloadProgressChangedEventHandler changed = null;
+                    changed = delegate(object sender, System.Net.DownloadProgressChangedEventArgs e)
+                    {
+                        this.OnDownloadProgressChanged(new DownloadProgressChangedArgs(download.Id, e.ProgressPercentage));
+
+                        if (e.ProgressPercentage >= 99)
+                            (sender as System.Net.WebClient).DownloadProgressChanged -= changed;
                     };
 
-                    dl.DownloadFileCompleted += handler;
+                    dl.DownloadFileCompleted += downloaded;
+                    dl.DownloadProgressChanged += changed;
                     dl.DownloadFileAsync(download.URL, download.Destination);
                     break;
                 }
@@ -140,23 +168,24 @@ namespace RedditReader.Net
         public class DownloadCompleteArgs : EventArgs
         {
             public string Id;
-            public DownloadCompleteArgs(string Id)
+            public string fileLocation;
+            public DownloadCompleteArgs(string Id, string fileLocation)
             {
                 this.Id = Id;
+                this.fileLocation = fileLocation;
+
             }
         }
 
         public class DownloadProgressChangedArgs : EventArgs
         {
             public string Id;
-            public int TotalBytesReceived;
-            public int TotalBytesExpected;
+            public int TotalPercentCompleted;
 
-            public DownloadProgressChangedArgs(string id, int totalreceived, int totalexpected)
+            public DownloadProgressChangedArgs(string id, int totalreceived)
             {
                 Id = id;
-                TotalBytesReceived = totalreceived;
-                TotalBytesExpected = totalexpected;
+                TotalPercentCompleted = totalreceived;
             }
         }
 

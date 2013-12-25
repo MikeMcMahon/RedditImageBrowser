@@ -6,21 +6,18 @@
              xmlns:local="clr-namespace:RedditReader"
              mc:Ignorable="d" 
              d:DesignHeight="55" d:DesignWidth="150">
-    <Grid Height="35"
-          Width="150"
-          Margin="0,10,0,10">
+    <Grid Height="35">
         <Rectangle VerticalAlignment="Stretch"
                    HorizontalAlignment="Stretch"
                    Stroke="#404040"
                    Fill="#CFCFCF"
                    StrokeThickness="0.5"
-                   RadiusX="17.25"
-                   RadiusY="17.25" />
+                   RadiusX="2"
+                   RadiusY="2" />
         <Grid Height="15"
               Width="15"
               HorizontalAlignment="Right"
               VerticalAlignment="Top">
-
             <Button x:Name="Remove"
                     x:FieldModifier="private"
                     Height="15"

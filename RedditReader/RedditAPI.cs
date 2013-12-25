@@ -26,16 +26,131 @@ namespace RedditReader
 
         private HttpClient client = new HttpClient();
 
+        private JsonConverter[] converters = { new NullBooleans() };
+
         public RedditAPI()
         {
             client.DefaultRequestHeaders.Accept.Add(
                 new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
         }
 
-        public Listing.RootObject GetListing(string subreddit)
+        /// <summary>
+        /// Is the subreddit valid?
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public bool ValidSubReddit(string name)
         {
-            HttpResponseMessage response = client.GetAsync(_API_URL + subreddit + ".json").Result;
-            return JsonConvert.DeserializeObject<Listing.RootObject>(response.Content.ReadAsStringAsync().Result);
+            string subreddit = ApiFormatFromUrl(name);
+            Dictionary<string, string> postData = new Dictionary<string,string>();
+            postData.Add("query", subreddit);
+            FormUrlEncodedContent httpContent = new FormUrlEncodedContent(postData);
+            HttpResponseMessage response = client.PostAsync(_API_URL + "/api/search_reddit_names.json", httpContent).Result;
+            string content = response.Content.ReadAsStringAsync().Result;
+            SubredditSearch.ByName names = Deserialize<SubredditSearch.ByName>(content);
+
+            foreach (string subredditName in names.names) {
+                if (subredditName.ToLower().Equals(subreddit.ToLower())) {
+                    return true;
+                }
+            }
+
+            return false;
         }
+
+        /// <summary>
+        /// Gets the details for a given subreddit
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public SubredditDetail SubredditDetails(string name)
+        {
+            HttpResponseMessage response = client.GetAsync(_API_URL + name + "/about.json").Result;
+            string content = response.Content.ReadAsStringAsync().Result;
+            return Deserialize<SubredditDetail>(content);
+        }
+
+        /// <summary>
+        /// Transforms a subreddit from url format /r/[subreddit] to api format [subreddit]
+        /// </summary>
+        /// <param name="subreddit"></param>
+        /// <returns></returns>
+        public string ApiFormatFromUrl(string subreddit)
+        {
+            return (subreddit.StartsWith("/r/")) ? subreddit.Substring(3) : subreddit;
+        }
+
+
+        /// <summary>
+        /// Deserializes to an object using our converters
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="content"></param>
+        /// <returns></returns>
+        private T Deserialize<T>(string content)
+        {
+            return JsonConvert.DeserializeObject<T>(content, converters);
+        }
+
+        /// <summary>
+        /// Gets the listing for the number of pages specifieds
+        /// </summary>
+        /// <param name="subreddit"></param>
+        /// <param name="pages"></param>
+        /// <returns></returns>
+        public Listing.RootObject GetListing(string subreddit, int pages=1)
+        {
+            Listing.RootObject listing = null;
+            Listing.RootObject tmpListing = null;
+            string after = "";
+            int i = 0;
+            do {
+                HttpResponseMessage response = client.GetAsync(_API_URL + subreddit + ".json" + after).Result;
+                string content = response.Content.ReadAsStringAsync().Result;
+
+                if (listing == null) {
+                    listing = Deserialize<Listing.RootObject>(content);
+                } else {
+                    tmpListing = Deserialize<Listing.RootObject>(content);
+                    foreach (var child in tmpListing.data.children) {
+                        listing.data.children.Add(child);
+                    }
+                }
+
+                after = "?after=" + listing.data.after;
+                if (++i >= pages)
+                    break;
+            } while (true);
+
+            if (tmpListing != null) {
+                listing.data.after = tmpListing.data.after;
+                listing.data.before = tmpListing.data.before;
+            }
+
+            //listing.data.children.Reverse();
+            return listing;
+        }
+
+        #region JsonConverters
+        private class NullBooleans : JsonConverter
+        {
+            public override bool CanConvert(Type objectType)
+            {
+                return (typeof(bool) == objectType);
+            }
+
+            public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+            {
+                if (reader.Value == null)
+                    return false;
+                return reader.Value;
+            }
+
+            public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+            {
+                throw new NotImplementedException();
+            }
+        }
+        #endregion
     }
 }
