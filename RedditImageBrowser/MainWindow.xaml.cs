@@ -59,6 +59,11 @@ namespace RedditImageBrowser
             SubredditsAvailable.SelectedIndex = 0;
         }
 
+        /// <summary>
+        /// Update the progress for the progress bar related to image downloads
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         async void ImageDownloader_DownloadProgressChanged(object sender, DownloadManager.DownloadProgressChangedArgs e)
         {
             await App.Current.Dispatcher.InvokeAsync(() => {
@@ -67,6 +72,11 @@ namespace RedditImageBrowser
             });
         }
 
+        /// <summary>
+        /// Update the status text for the image downloader progress bar
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         async void ImageDownloader_DownloadComplete(object sender, DownloadManager.DownloadCompleteArgs e)
         {
             await App.Current.Dispatcher.InvokeAsync(() =>
@@ -76,7 +86,9 @@ namespace RedditImageBrowser
             });
         }
 
-        // Updates the progress bar with download progress
+        /// <summary>
+        /// Updates the progress bar with download progress
+        /// </summary>
         async void ThumbDownloader_DownloadProgressChanged(object sender, DownloadManager.DownloadProgressChangedArgs e)
         {
             await App.Current.Dispatcher.InvokeAsync(() => {
@@ -84,7 +96,11 @@ namespace RedditImageBrowser
             });
         }
 
-        // Updates the progress bar with the download progress
+        /// <summary>
+        /// Updates the progress bar with the download progress
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         async void ThumbDownloader_DownloadComplete(object sender, DownloadManager.DownloadCompleteArgs e)
         {
             // Due to thread affinity we are locked to the UI thread with this, maybe we can put this into another thread
@@ -93,6 +109,12 @@ namespace RedditImageBrowser
         }
 
 
+        /// <summary>
+        /// Pushes new thumbnails to the UI as they are available
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="thumb"></param>
+        /// <returns></returns>
         private async Task UpdateThumbnailCollectionAsync(string id, string thumb)
         {
             var item = deferredThumbnails.Where(child => child.data.name.Equals(id));
@@ -114,7 +136,7 @@ namespace RedditImageBrowser
             Subscribed item = (Subscribed)SubredditsAvailable.SelectedItem;
             var name = item.name;
             var pages = ((Config)DataContext).AppConfig.reddit_pages;
-            Listing.RootObject listings = RedditAPI.GetListing(name, pages);
+            Listing listings = RedditAPI.GetListing(name, pages);
             Uri downloadUrl = null;
             foreach (RedditImageBrowser.Json.Listing.Child child in listings.data.children) {
                 try {
@@ -135,6 +157,12 @@ namespace RedditImageBrowser
             //this.SubredditLabels.Children.Remove(((UIElement)sender));
         }
 
+
+        /// <summary>
+        /// The UI portion of when a subreddit is clicked on
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void AddSubReddit_Click(object sender, RoutedEventArgs e)
         {
             AddSubReddit dlg = new AddSubReddit();
@@ -157,6 +185,12 @@ namespace RedditImageBrowser
             }
         }
 
+        /// <summary>
+        /// Tries to obtain the information for the subreddit and then create a new entry in the config
+        /// This should probably happen in the configuration class not the ui class
+        /// </summary>
+        /// <param name="subreddit"></param>
+        /// <returns></returns>
         private bool AddSubreddit(string subreddit)
         {
             bool valid = this.RedditAPI.ValidSubReddit(subreddit);
@@ -172,6 +206,11 @@ namespace RedditImageBrowser
             return true;
         }
 
+        /// <summary>
+        /// Opens the configuration dialog and updates the view if changes were made to the config
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void OpenConfiguration(object sender, RoutedEventArgs e)
         {
             Configuration config = new Configuration();
@@ -183,25 +222,49 @@ namespace RedditImageBrowser
             }
         }
 
+        /// <summary>
+        /// Updates what subreddit to show based on the selection
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void SubredditsAvailable_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             ThumbnailDownloader.CancelAllDownloads();
             UpdateListings();
         }
 
+        /// <summary>
+        /// When the window is closing we should gracefully close
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
             ThumbnailDownloader.Stop();
             ThumbnailDownloader.CancelAllDownloads(false);
             ThumbnailDownloader.Dispose();
+
+            ImageDownloader.Stop();
+            ImageDownloader.CancelAllDownloads(false);
+            ImageDownloader.Dispose();
         }
 
+        /// <summary>
+        /// Refresh the subreddit selected
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void RefreshSubreddits(object sender, RoutedEventArgs e)
         {
             ThumbnailDownloader.CancelAllDownloads();
             UpdateListings();
         }
 
+        /// <summary>
+        /// For every selected image lets download that mofo
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void DownloadSelected_Click(object sender, RoutedEventArgs e)
         {
             foreach (Listing.Child item in ThumbnailGrid.SelectedItems) {
@@ -213,11 +276,21 @@ namespace RedditImageBrowser
             }
         }
 
+        /// <summary>
+        /// Scroll the reddits available down
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void ScrollDown_MouseDown(object sender, RoutedEventArgs e)
         {
             SubredditScroller.ScrollToVerticalOffset(SubredditScroller.VerticalOffset + scrollOffset);
         }
 
+        /// <summary>
+        /// Scroll the reddits available up
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void ScrollUp_MouseDown(object sender, RoutedEventArgs e)
         {
             SubredditScroller.ScrollToVerticalOffset(SubredditScroller.VerticalOffset - scrollOffset);

@@ -10,6 +10,9 @@ namespace RedditImageBrowser.Json
 {
     class Listing
     {
+        public string kind { get; set; }
+        public Data data { get; set; }
+
         public static bool IsSupportedFormat(Uri url)
         {
             foreach (string ext in Config.supporfted_file_formats.ToList<string>()) {
@@ -85,12 +88,6 @@ namespace RedditImageBrowser.Json
             // spublic List<Child> children { get; set; }
             public string after { get; set; }
             public object before { get; set; }
-        }
-
-        public class RootObject
-        {
-            public string kind { get; set; }
-            public Data data { get; set; }
         }
     }
 }

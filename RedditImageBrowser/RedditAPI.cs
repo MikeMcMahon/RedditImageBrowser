@@ -98,10 +98,10 @@ namespace RedditImageBrowser
         /// <param name="subreddit"></param>
         /// <param name="pages"></param>
         /// <returns></returns>
-        public Listing.RootObject GetListing(string subreddit, int pages=1)
+        public Listing GetListing(string subreddit, int pages=1)
         {
-            Listing.RootObject listing = null;
-            Listing.RootObject tmpListing = null;
+            Listing listing = null;
+            Listing tmpListing = null;
             string after = "";
             int i = 0;
             do {
@@ -109,9 +109,9 @@ namespace RedditImageBrowser
                 string content = response.Content.ReadAsStringAsync().Result;
 
                 if (listing == null) {
-                    listing = Deserialize<Listing.RootObject>(content);
+                    listing = Deserialize<Listing>(content);
                 } else {
-                    tmpListing = Deserialize<Listing.RootObject>(content);
+                    tmpListing = Deserialize<Listing>(content);
                     foreach (var child in tmpListing.data.children) {
                         listing.data.children.Add(child);
                     }
