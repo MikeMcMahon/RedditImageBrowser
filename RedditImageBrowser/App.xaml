@@ -1,0 +1,17 @@
+﻿<Application x:Class="RedditImageBrowser.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:Common="clr-namespace:RedditImageBrowser.Common"
+             xmlns:Data="clr-namespace:RedditImageBrowser.DataSource"
+             StartupUri="MainWindow.xaml">
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Common/StandardStyles.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+            
+            <Data:SubredditContent x:Key="SubredditsDataSource" x:Name="Content" />
+            <Common:Config x:Key="ConfigDataSource" x:Name="ApplicationConfig"/>
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>

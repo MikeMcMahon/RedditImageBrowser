@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RedditImageBrowser", "RedditReader\RedditImageBrowser.csproj", "{7F9A8700-181E-4B5D-984C-537FC6CDCD3A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RedditImageBrowser", "RedditImageBrowser\RedditImageBrowser.csproj", "{7F9A8700-181E-4B5D-984C-537FC6CDCD3A}"
 EndProject
 Project("{6141683F-8A12-4E36-9623-2EB02B2C2303}") = "Installer", "Installer\Installer.isproj", "{9B9C1D51-CF85-4932-AEA0-23838A1131EE}"
 	ProjectSection(ProjectDependencies) = postProject
