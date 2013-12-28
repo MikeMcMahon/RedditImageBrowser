@@ -218,11 +218,11 @@
                         <Button x:Name="RefreshTopBar" 
                                 Content="&#xE14A;"
                                 Foreground="White"
-                                ToolTip="Download Selected File(s)"
+                                ToolTip="Refresh Subreddit"
                                 Style="{StaticResource BaseToolbarButton}" Click="RefreshSubreddits"/>
                         <Button x:Name="OpenConfigTopBar" Content="&#xE115;"
                                 Foreground="White"
-                                ToolTip="Download Selected File(s)"
+                                ToolTip="Configuration"
                                 Style="{StaticResource BaseToolbarButton}" Click="OpenConfiguration" />
                     </WrapPanel>
                     <ListView x:Name="ThumbnailGrid"
