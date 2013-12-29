@@ -98,6 +98,7 @@ namespace RedditImageBrowser.Common
             AppConfig = PopulateJSON<AppConfig>(ConfigFilePath, string.Format(@"{{
     ""username"":"""",
     ""password"":"""",
+    ""modhash"":"""",
     ""download_directory"": ""{0}"",
     ""reddit_pages"": {1}
 }}",

@@ -87,7 +87,7 @@ namespace RedditImageBrowser.Json
             public ObservableCollection<Child> children { get; set; }
             // spublic List<Child> children { get; set; }
             public string after { get; set; }
-            public object before { get; set; }
+            public string before { get; set; }
         }
     }
 }

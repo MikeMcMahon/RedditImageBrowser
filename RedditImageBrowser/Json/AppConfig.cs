@@ -15,11 +15,35 @@ namespace RedditImageBrowser.Json
         private string _password;
         private string _download_directory;
         private int _reddit_pages;
+        private string _modhash;
 
         /// <summary>
         /// The username to log into reddit with
         /// </summary>
         public string username { get { return _username; } set { SetProperty(ref _username, value); } }
+
+        
+        /// <summary>
+        /// Gets or sets the modhash for the user, the modhash is essentially the logon hash
+        /// </summary>
+        public string modhash
+        {
+            get
+            {
+                if (_modhash == null)
+                    return "";
+
+                byte[] secured = Convert.FromBase64String(_modhash);
+                byte[] unsecured = System.Security.Cryptography.ProtectedData.Unprotect(secured, entropy, System.Security.Cryptography.DataProtectionScope.CurrentUser);
+                return Encoding.Unicode.GetString(unsecured);
+            }
+            set
+            {
+                byte[] unsecured = Encoding.Unicode.GetBytes(value);
+                byte[] secured = System.Security.Cryptography.ProtectedData.Protect(unsecured, entropy, System.Security.Cryptography.DataProtectionScope.CurrentUser);
+                SetProperty(ref _modhash, Convert.ToBase64String(secured));
+            }
+        }
 
         /// <summary>
         /// The password to use with reddit
@@ -28,6 +52,9 @@ namespace RedditImageBrowser.Json
         {
             get
             {
+                if (_password == null)
+                    return "";
+
                 byte[] secured = Convert.FromBase64String(_password);
                 byte[] unsecured = System.Security.Cryptography.ProtectedData.Unprotect(secured, entropy, System.Security.Cryptography.DataProtectionScope.CurrentUser);
                 return Encoding.Unicode.GetString(unsecured);

@@ -224,6 +224,14 @@
                                 Foreground="White"
                                 ToolTip="Configuration"
                                 Style="{StaticResource BaseToolbarButton}" Click="OpenConfiguration" />
+                        <Button x:Name="PrevPage" Content="&#xE100;"
+                                Foreground="White"
+                                ToolTip="Previous"
+                                Style="{StaticResource BaseToolbarButton}" Click="PrevPage_Click" />
+                        <Button x:Name="NextPage" Content="&#xE101;"
+                                Foreground="White"
+                                ToolTip="Next"
+                                Style="{StaticResource BaseToolbarButton}" Click="NextPage_Click"/>
                     </WrapPanel>
                     <ListView x:Name="ThumbnailGrid"
                               Grid.Row="1"

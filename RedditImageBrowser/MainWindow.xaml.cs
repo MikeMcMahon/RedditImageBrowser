@@ -32,7 +32,7 @@ namespace RedditImageBrowser
         Reddit RedditAPI = null;
         DownloadManager ThumbnailDownloader = null;
         DownloadManager ImageDownloader = null;
-        int scrollOffset = 35;
+        int RedditScrollOffset = 35;
 
         /// <summary>
         /// A deferred set of thumbnails to be shown as their respective thumbnails are complete
@@ -53,7 +53,7 @@ namespace RedditImageBrowser
             }
 
             {
-                ThumbnailDownloader = new DownloadManager(5, 250);
+                ThumbnailDownloader = new DownloadManager(1, 250); // we set this to one so that they come in serially 
                 ThumbnailDownloader.DownloadComplete += ThumbDownloader_DownloadComplete;
                 ThumbnailDownloader.DownloadProgressChanged += ThumbDownloader_DownloadProgressChanged;
                 ThumbnailDownloader.Start();
@@ -129,16 +129,49 @@ namespace RedditImageBrowser
         }
 
         /// <summary>
+        /// Gets the selected subreddit
+        /// </summary>
+        /// <returns></returns>
+        private string SelectedSubreddit
+        {
+            get
+            {
+                Subscribed item = (Subscribed)SubredditsAvailable.SelectedItem;
+                if (item != null)
+                    return item.name;
+
+                return "";
+            }
+        }
+
+        /// <summary>
+        /// Gets the pages to display 
+        /// </summary>
+        private int PagesToDisplay
+        {
+            get
+            {
+                return ((Config)DataContext).AppConfig.reddit_pages;
+            }
+        }
+
+        /// <summary>
         /// Clears and updates the listing for the given subreddit
         /// </summary>
         void UpdateListings()
         {
             ((ObservableCollection<Listing.Child>)ThumbnailGrid.ItemsSource).Clear();
 
-            Subscribed item = (Subscribed)SubredditsAvailable.SelectedItem;
-            var name = item.name;
-            var pages = ((Config)DataContext).AppConfig.reddit_pages;
-            Listing listings = RedditAPI.GetListing(name, pages);
+            Listing listings = RedditAPI.GetListing(SelectedSubreddit, PagesToDisplay);
+            DeferThumbnails(listings);
+        }
+
+        /// <summary>
+        /// Adds the thumbnails to the deferred listings to be dispatched by the ui thread later
+        /// </summary>
+        /// <param name="listings"></param>
+        private void DeferThumbnails(Listing listings)
+        {
             Uri downloadUrl = null;
             foreach (RedditImageBrowser.Json.Listing.Child child in listings.data.children) {
                 try {
@@ -148,8 +181,11 @@ namespace RedditImageBrowser
                 }
 
                 if (downloadUrl != null)
-                    ThumbnailDownloader.AddDownload(child.data.name, downloadUrl, System.IO.Path.Combine(ApplicationConfig.AppConfig.thumbnail_directory, child.data.name + ".jpg") );
+                    ThumbnailDownloader.AddDownload(child.data.name, downloadUrl, System.IO.Path.Combine(ApplicationConfig.AppConfig.thumbnail_directory, child.data.name + ".jpg"));
             }
+
+            if (deferredThumbnails != null)
+                deferredThumbnails.Clear();
 
             deferredThumbnails = listings.data.children;
         }
@@ -219,7 +255,7 @@ namespace RedditImageBrowser
             config.ShowDialog();
 
             if (config.DialogResult == true) {
-                // Update anything we need to update
+                ThumbnailDownloader.CancelAllDownloads();
                 UpdateListings();
             }
         }
@@ -285,7 +321,7 @@ namespace RedditImageBrowser
         /// <param name="e"></param>
         private void ScrollDown_MouseDown(object sender, RoutedEventArgs e)
         {
-            SubredditScroller.ScrollToVerticalOffset(SubredditScroller.VerticalOffset + scrollOffset);
+            SubredditScroller.ScrollToVerticalOffset(SubredditScroller.VerticalOffset + RedditScrollOffset);
         }
 
         /// <summary>
@@ -295,7 +331,44 @@ namespace RedditImageBrowser
         /// <param name="e"></param>
         private void ScrollUp_MouseDown(object sender, RoutedEventArgs e)
         {
-            SubredditScroller.ScrollToVerticalOffset(SubredditScroller.VerticalOffset - scrollOffset);
+            SubredditScroller.ScrollToVerticalOffset(SubredditScroller.VerticalOffset - RedditScrollOffset);
+        }
+
+        private void PrevPage_Click(object sender, RoutedEventArgs e)
+        {
+            var list = (ObservableCollection<Listing.Child>)ThumbnailGrid.ItemsSource;
+            if (list.Count > 0) {
+                var firstItem = list.First<Listing.Child>();
+                Listing listings = RedditAPI.GetListing(SelectedSubreddit, PagesToDisplay, false, firstItem.data.name);
+
+                if (listings.data.children.Count == 0)
+                    return;
+
+                ThumbnailDownloader.CancelAllDownloads();
+                list.Clear();
+                DeferThumbnails(listings);
+            }
+        }
+
+        /// <summary>
+        /// Navigates to the next page
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void NextPage_Click(object sender, RoutedEventArgs e)
+        {
+            var list = (ObservableCollection<Listing.Child>)ThumbnailGrid.ItemsSource;
+            if (list.Count > 0) {
+                var lastItem = list.Last<Listing.Child>();
+                Listing listings = RedditAPI.GetListing(SelectedSubreddit, PagesToDisplay, true, lastItem.data.name);
+
+                if (listings.data.children.Count == 0)
+                    return;
+
+                ThumbnailDownloader.CancelAllDownloads();
+                list.Clear();
+                DeferThumbnails(listings);
+            }
         }
     }
 }

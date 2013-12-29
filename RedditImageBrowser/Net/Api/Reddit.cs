@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using RedditImageBrowser.Common;
 using RedditImageBrowser.Json;
 using System;
 using System.Collections.Generic;
@@ -93,37 +94,50 @@ namespace RedditImageBrowser.Net.Api
         }
 
         /// <summary>
-        /// Gets the listing for the number of pages specifieds
+        /// Gets the listing
         /// </summary>
-        /// <param name="subreddit"></param>
-        /// <param name="pages"></param>
-        /// <returns></returns>
-        public Listing GetListing(string subreddit, int pages=1)
+        /// <param name="subreddit">the subreddit to search</param>
+        /// <param name="pages">the number of pages to return</param>
+        /// <param name="forwards">true = forwards, false = backwards</param>
+        /// <param name="fullname">if searching from a midpoint... the fullname of the item</param>
+        /// <returns>The listing from subreddit</returns>
+        public Listing GetListing(string subreddit, int pages = 1, bool forwards = true, string fullname = "")
         {
             Listing listing = null;
             Listing tmpListing = null;
-            string after = "";
+            string next = "";
+            
+            if (!fullname.Equals(""))
+                next = GetListingDirection(forwards, fullname);
+
             int i = 0;
             do {
-                HttpResponseMessage response = client.GetAsync(_API_URL + subreddit + ".json" + after).Result;
-                string content = response.Content.ReadAsStringAsync().Result;
+                using (HttpResponseMessage response = client.GetAsync(_API_URL + subreddit + ".json" + next).Result) {
+                    string content = response.Content.ReadAsStringAsync().Result;
 
-                if (listing == null) {
-                    listing = Deserialize<Listing>(content);
-                } else {
-                    tmpListing = Deserialize<Listing>(content);
-                    
-                    if (tmpListing.data.after.Equals(listing.data.after))
-                        break;  // ensures we don't query a subreddit for the same page over and over
+                    if (listing == null) {
+                        listing = Deserialize<Listing>(content);
 
-                    foreach (var child in tmpListing.data.children) {
-                        listing.data.children.Add(child);
+                        next = GetNextListingFullname(forwards, listing, next);
+
+                    } else {
+                        tmpListing = Deserialize<Listing>(content);
+
+                        foreach (var child in tmpListing.data.children) {
+                            listing.data.children.Add(child);
+                        }
+
+                        next = GetNextListingFullname(forwards, tmpListing, next);
                     }
-                }
 
-                after = "?after=" + listing.data.after;
-                if (++i >= pages)
-                    break;
+                    if (next == null || next.Equals(""))
+                        break;
+
+                    next = GetListingDirection(forwards, next);
+
+                    if (++i >= pages)
+                        break;
+                }
             } while (true);
 
             if (tmpListing != null) {
@@ -131,7 +145,83 @@ namespace RedditImageBrowser.Net.Api
                 listing.data.before = tmpListing.data.before;
             }
 
+            ScrubListing(listing);
             return listing;
+        }
+
+        /// <summary>
+        /// Removes entries from the listing we cannot process yet or will never process (like stickies and non image having links)
+        /// </summary>
+        /// <param name="listing"></param>
+        private void ScrubListing(Listing listing)
+        {
+            Uri uri = null;
+            IList<Listing.Child> remove = new List<Listing.Child>();
+            bool valid = false;
+
+            foreach (Listing.Child child in listing.data.children) {
+                { // supported thumbnails
+                    try {
+                        uri = new Uri(child.data.thumbnail);
+                    } catch (UriFormatException e) {
+                        remove.Add(child);
+                        continue;
+                    }
+                }
+
+                { // supported images
+                    try {
+                        uri = new Uri(child.data.url);
+                    } catch (UriFormatException e) {
+                        remove.Add(child);
+                        continue;
+                    }
+
+                    valid = false;
+                    foreach (var format in Config.supporfted_file_formats) {
+                        if (uri.AbsolutePath.ToLower().EndsWith(format))
+                            valid = true;
+                    }
+
+                    if (!valid)
+                        remove.Add(child);
+                }
+            }
+
+            foreach (Listing.Child bad in remove)
+                listing.data.children.Remove(bad);
+        }
+
+        private static string GetNextListingFullname(bool forwards, Listing listing, string next)
+        {
+            if (forwards)
+                next = listing.data.after;
+            else
+                next = listing.data.before;
+            return next;
+        }
+
+        private string GetListingDirection(bool forwards, string fullname)
+        {
+            string direction = "";
+
+            if (forwards & fullname != null)
+                direction = "?after=" + fullname;
+            else if (!forwards & fullname != null)
+                direction = "?before=" + fullname;
+
+            return direction;
+        }
+
+        /// <summary>
+        /// Logs in via the standard login api call
+        /// </summary>
+        /// <param name="username"></param>
+        /// <param name="password"></param>
+        /// <returns></returns>
+        public bool Login(string username, string password)
+        {
+            return true;
         }
 
         #region JsonConverters
