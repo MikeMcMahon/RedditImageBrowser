@@ -12,9 +12,18 @@ namespace RedditImageBrowser.Json
     {
         private byte[] entropy = { 1, 3, 27, 255, 23, 44, 108, 128 };
         private string _username;
+        private string _password;
+        private string _download_directory;
+        private int _reddit_pages;
+
+        /// <summary>
+        /// The username to log into reddit with
+        /// </summary>
         public string username { get { return _username; } set { SetProperty(ref _username, value); } }
 
-        private string _password;
+        /// <summary>
+        /// The password to use with reddit
+        /// </summary>
         public string password
         {
             get
@@ -30,14 +39,20 @@ namespace RedditImageBrowser.Json
                 SetProperty(ref _password, Convert.ToBase64String(secured));
             }
         }
-
-        // TODO - add to the SetProperty stuff
-        private string _download_directory;
+        
+        /// <summary>
+        /// The directory to download files to
+        /// </summary>
         public string download_directory { get { return _download_directory; } set { SetProperty(ref _download_directory, value); } }
 
+        /// <summary>
+        /// The directory to drop the thumbnails into
+        /// </summary>
         public string thumbnail_directory { get { return Path.Combine(download_directory, "thumbs"); } }
 
-        private int _reddit_pages;
+        /// <summary>
+        /// The number of reddit pages to seek
+        /// </summary>
         public int reddit_pages { get { return _reddit_pages; } set { SetProperty(ref _reddit_pages, value); } }
     }
 }
