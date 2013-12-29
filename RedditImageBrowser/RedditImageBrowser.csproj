@@ -81,11 +81,11 @@
     <Compile Include="Json\SubredditSearch.cs" />
     <Compile Include="Json\Subreddits.cs" />
     <Compile Include="Net\DownloadManager.cs" />
-    <Compile Include="RedditAPI.cs" />
-    <Compile Include="SubredditLabel.xaml.cs">
+    <Compile Include="Net\Api\RedditAPI.cs" />
+    <Compile Include="CustomControls\SubredditLabel.xaml.cs">
       <DependentUpon>SubredditLabel.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Thumbnail.xaml.cs">
+    <Compile Include="CustomControls\Thumbnail.xaml.cs">
       <DependentUpon>Thumbnail.xaml</DependentUpon>
     </Compile>
     <Compile Include="Configuration.xaml.cs">
@@ -110,11 +110,11 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="SubredditLabel.xaml">
+    <Page Include="CustomControls\SubredditLabel.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Thumbnail.xaml">
+    <Page Include="CustomControls\Thumbnail.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -165,6 +165,7 @@
   <ItemGroup>
     <Resource Include="reddit.ico" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

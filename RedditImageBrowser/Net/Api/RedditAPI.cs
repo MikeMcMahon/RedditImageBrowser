@@ -7,9 +7,9 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace RedditImageBrowser
+namespace RedditImageBrowser.Net.Api
 {
-    class RedditAPI
+    class Reddit
     {
         private const string _AUTHORIZATION_URL = @"https://ssl.reddit.com/api/v1/authorize";
         private const string _ACCESS_TOKEN_URL = @"https://ssl.reddit.com/api/v1/access_token";
@@ -28,7 +28,7 @@ namespace RedditImageBrowser
 
         private JsonConverter[] converters = { new NullBooleans() };
 
-        public RedditAPI()
+        public Reddit()
         {
             client.DefaultRequestHeaders.Accept.Add(
                 new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));

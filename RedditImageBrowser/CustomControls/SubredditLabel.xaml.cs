@@ -13,7 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace RedditImageBrowser
+namespace RedditImageBrowser.CustomControls
 {
     /// <summary>
     /// Interaction logic for SubredditLabel.xaml

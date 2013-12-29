@@ -1,7 +1,9 @@
 ﻿using RedditImageBrowser.Common;
+using RedditImageBrowser.CustomControls;
 using RedditImageBrowser.DataSource;
 using RedditImageBrowser.Json;
 using RedditImageBrowser.Net;
+using RedditImageBrowser.Net.Api;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -27,7 +29,7 @@ namespace RedditImageBrowser
     public partial class MainWindow : Window
     {
         Config ApplicationConfig = null;
-        RedditAPI RedditAPI = null;
+        Reddit RedditAPI = null;
         DownloadManager ThumbnailDownloader = null;
         DownloadManager ImageDownloader = null;
         int scrollOffset = 35;
@@ -42,7 +44,7 @@ namespace RedditImageBrowser
             InitializeComponent();
 
             ApplicationConfig = DataContext as Config;
-            RedditAPI = new RedditAPI();
+            RedditAPI = new Reddit();
             {
                 ImageDownloader = new DownloadManager(2, 750);
                 ImageDownloader.DownloadComplete += ImageDownloader_DownloadComplete;
