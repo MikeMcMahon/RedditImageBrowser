@@ -165,9 +165,9 @@ namespace RedditImageBrowser
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void AddSubReddit_Click(object sender, RoutedEventArgs e)
+        private void AddSubreddit_Click(object sender, RoutedEventArgs e)
         {
-            AddSubReddit dlg = new AddSubReddit();
+            AddSubreddit dlg = new AddSubreddit();
             dlg.Owner = this;
             dlg.WindowStartupLocation = System.Windows.WindowStartupLocation.CenterOwner;
             dlg.ShowDialog();
@@ -176,13 +176,13 @@ namespace RedditImageBrowser
             {
                 bool exists = false;
                 foreach (Subscribed subreddit in SubredditsAvailable.ItemsSource) {
-                    if (subreddit.name.ToLower().Equals(dlg.SubRedditText.Text.ToLower())) {
+                    if (subreddit.name.ToLower().Equals(dlg.SubredditText.Text.ToLower())) {
                         exists = true;
                         break;
                     }
                 }
                 if (!exists) {
-                    AddSubreddit(dlg.SubRedditText.Text);
+                    AddSubreddit(dlg.SubredditText.Text);
                 }
             }
         }
@@ -195,7 +195,7 @@ namespace RedditImageBrowser
         /// <returns></returns>
         private bool AddSubreddit(string subreddit)
         {
-            bool valid = this.RedditAPI.ValidSubReddit(subreddit);
+            bool valid = this.RedditAPI.ValidSubreddit(subreddit);
 
             if (!valid)
                 return false;

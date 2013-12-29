@@ -22,7 +22,7 @@
                     x:FieldModifier="private"
                     Height="15"
                     Width="15"
-                    Style="{StaticResource SubRedditLabelRemoveSub}"
+                    Style="{StaticResource SubredditLabelRemoveSub}"
                     >
             </Button>
         </Grid>

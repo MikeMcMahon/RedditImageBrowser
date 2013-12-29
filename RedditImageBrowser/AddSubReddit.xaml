@@ -1,16 +1,16 @@
-﻿<Window x:Class="RedditImageBrowser.AddSubReddit"
+﻿<Window x:Class="RedditImageBrowser.AddSubreddit"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Enter SubReddit" Height="52" Width="271" WindowStyle="ToolWindow" ResizeMode="NoResize" ShowInTaskbar="False" SizeToContent="WidthAndHeight">
+        Title="Enter Subreddit" Height="52" Width="271" WindowStyle="ToolWindow" ResizeMode="NoResize" ShowInTaskbar="False" SizeToContent="WidthAndHeight">
     <Grid>
         <StackPanel Orientation="Horizontal">
-        <TextBox x:Name="SubRedditText"
+        <TextBox x:Name="SubredditText"
                  HorizontalAlignment="Stretch"
                  VerticalAlignment="Stretch"
                  Width="200"
-                 TextChanged="SubRedditText_TextChanged"
-                 TextInput="SubRedditText_TextInput"
-                 KeyDown="SubRedditText_KeyDown"
+                 TextChanged="SubredditText_TextChanged"
+                 TextInput="SubredditText_TextInput"
+                 KeyDown="SubredditText_KeyDown"
                  Text="/r/"/>
         <Button x:Name="Confirm" Content="Ok" HorizontalAlignment="Right" Click="Confirm_Click"/>
         <Button x:Name="Cancel" Content="Cancel" HorizontalAlignment="Right" Click="Cancel_Click"/>

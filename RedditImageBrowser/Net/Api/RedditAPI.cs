@@ -39,7 +39,7 @@ namespace RedditImageBrowser.Net.Api
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
-        public bool ValidSubReddit(string name)
+        public bool ValidSubreddit(string name)
         {
             string subreddit = ApiFormatFromUrl(name);
             Dictionary<string, string> postData = new Dictionary<string,string>();

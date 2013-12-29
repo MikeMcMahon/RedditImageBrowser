@@ -17,9 +17,9 @@ namespace RedditImageBrowser
     /// <summary>
     /// Interaction logic for Window1.xaml
     /// </summary>
-    public partial class AddSubReddit : Window
+    public partial class AddSubreddit : Window
     {
-        public AddSubReddit()
+        public AddSubreddit()
         {
             InitializeComponent();
         }
@@ -39,35 +39,35 @@ namespace RedditImageBrowser
             this.Close();
         }
         #region Validate Sub Reddit Entered
-        private void SubRedditText_KeyDown(object sender, KeyEventArgs e)
+        private void SubredditText_KeyDown(object sender, KeyEventArgs e)
         {
             ValidateInput();
         }
 
-        private void SubRedditText_TextChanged(object sender, TextChangedEventArgs e)
+        private void SubredditText_TextChanged(object sender, TextChangedEventArgs e)
         {
             ValidateInput();
         }
 
-        private void SubRedditText_TextInput(object sender, TextCompositionEventArgs e)
+        private void SubredditText_TextInput(object sender, TextCompositionEventArgs e)
         {
             ValidateInput();
         }
 
         bool ValidateInput()
         {
-            if (!this.SubRedditText.Text.StartsWith("/r/"))
+            if (!this.SubredditText.Text.StartsWith("/r/"))
             {
                 Color lightRed = new Color();
                 lightRed.R = 255;
                 lightRed.A = 60;
                 SolidColorBrush br = new SolidColorBrush(lightRed);
-                this.SubRedditText.Background = br;
+                this.SubredditText.Background = br;
                 return false;
             }
             else
             {
-                this.SubRedditText.Background = Brushes.White;
+                this.SubredditText.Background = Brushes.White;
                 return true;
             }
         }
