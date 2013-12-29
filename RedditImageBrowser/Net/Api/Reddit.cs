@@ -112,6 +112,10 @@ namespace RedditImageBrowser.Net.Api
                     listing = Deserialize<Listing>(content);
                 } else {
                     tmpListing = Deserialize<Listing>(content);
+                    
+                    if (tmpListing.data.after.Equals(listing.data.after))
+                        break;  // ensures we don't query a subreddit for the same page over and over
+
                     foreach (var child in tmpListing.data.children) {
                         listing.data.children.Add(child);
                     }
@@ -127,7 +131,6 @@ namespace RedditImageBrowser.Net.Api
                 listing.data.before = tmpListing.data.before;
             }
 
-            //listing.data.children.Reverse();
             return listing;
         }
 
