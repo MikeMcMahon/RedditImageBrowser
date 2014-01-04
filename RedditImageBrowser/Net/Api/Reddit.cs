@@ -90,6 +90,7 @@ namespace RedditImageBrowser.Net.Api
         /// <returns></returns>
         private T Deserialize<T>(string content)
         {
+            // TODO - if received JSON is bad... CATCH IT
             return JsonConvert.DeserializeObject<T>(content, converters);
         }
 
@@ -112,7 +113,9 @@ namespace RedditImageBrowser.Net.Api
 
             int i = 0;
             do {
+                // TODO - how to handle if we receive a reddit is down message
                 using (HttpResponseMessage response = client.GetAsync(_API_URL + subreddit + ".json" + next).Result) {
+                    
                     string content = response.Content.ReadAsStringAsync().Result;
 
                     if (listing == null) {

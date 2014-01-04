@@ -187,10 +187,10 @@
                             <ListView.ItemTemplate>
                                 <DataTemplate>
                                     <Grid>
-                                        <local:SubredditLabel  RemoveClicked="label_RemoveClicked"
-                                                        HorizontalAlignment="Stretch"
-                                                        ToolTip="{Binding description}"
-                                                        Text="{Binding name}">
+                                        <local:SubredditLabel HorizontalAlignment="Stretch"
+                                                              ToolTip="{Binding description}"
+                                                              Text="{Binding name}"
+                                                              RemoveClicked="SubredditLabel_RemoveClicked">
                                             <local:SubredditLabel.Margin>
                                                 <Thickness />
                                             </local:SubredditLabel.Margin>

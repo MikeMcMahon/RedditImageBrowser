@@ -46,7 +46,10 @@ namespace RedditImageBrowser
 
         private void SelectDownloadDirectory(object sender, RoutedEventArgs e)
         {
-
+            // TODO - this dialog sucks a big fat one
+            System.Windows.Forms.FolderBrowserDialog downloadDir = new System.Windows.Forms.FolderBrowserDialog();
+            downloadDir.SelectedPath = DownloadDir.Text;
+            downloadDir.ShowDialog();
         }
     }
 }

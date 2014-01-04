@@ -6,12 +6,12 @@
         Height="203"
         Width="538"
         DataContext="{StaticResource ConfigDataSource}"
-        ResizeMode="NoResize" SizeToContent="Height">
+        ResizeMode="NoResize" SizeToContent="Height" WindowStartupLocation="CenterOwner">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="33" />
             <RowDefinition Height="*" />
-            <RowDefinition Height="40" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="30*" />
@@ -80,29 +80,12 @@
 					Background="Transparent"
 					FontSize="12"
 					Foreground="White"
-                    Click="SelectDownloadDirectory">
+                    Click="SelectDownloadDirectory"
+                    Style="{StaticResource ResourceKey=BaseToolbarButton}"
+                    Content="&#xE197;">
                     <Button.Margin>
-                        <Thickness Left="10" />
+                        <Thickness Top="10" Left="10" Bottom="5"/>
                     </Button.Margin>
-                    <Grid>
-                        <Rectangle Fill="Transparent"
-							Stroke="White"
-							HorizontalAlignment="Stretch"
-							VerticalAlignment="Stretch"
-							RadiusX="20"
-							RadiusY="20"
-							StrokeThickness="2" />
-                        <TextBlock Text="&#xE197;"
-							Padding="5,5,5,5">
-                            <TextBlock.Effect>
-                                <DropShadowEffect ShadowDepth="2"
-									Direction="330"
-									Color="Black"
-									Opacity="1"
-									BlurRadius="0" />
-                            </TextBlock.Effect>
-                        </TextBlock>
-                    </Grid>
                 </Button>
             </WrapPanel>
             <Grid>
@@ -129,17 +112,19 @@
                    Grid.Row="2"
                    HorizontalAlignment="Right"
                    Orientation="Horizontal"
-                   VerticalAlignment="Stretch"
-                   Height="40">
+                   VerticalAlignment="Stretch">
             <Button Grid.Column="1"
                     Grid.Row="2"
                     Content="Okay"
-                    Click="SaveAndClose" />
+                    IsDefault="True"
+                    Click="SaveAndClose" 
+                    Style="{StaticResource DialogOkButton}" />
             <Button Grid.Column="1"
                     Grid.Row="2"
                     HorizontalAlignment="Left"
                     Content="Cancel"
-                    Click="CancelAndClose" />
+                    Click="CancelAndClose" 
+                    Style="{StaticResource DialogCancelButton}"/>
         </WrapPanel>
     </Grid>
 </Window>

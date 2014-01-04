@@ -16,7 +16,7 @@ namespace RedditImageBrowser.Json
         public List<string> downloaded { get; set; }
     }
 
-    class Subreddits : ObservableCollection<Subscribed> // ICollection<Subscribed>
+    class Subreddits : ObservableCollection<Subscribed>
     {
         public Subreddits()
         {

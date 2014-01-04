@@ -67,10 +67,15 @@ namespace RedditImageBrowser
             }
             else
             {
-                this.SubredditText.Background = Brushes.White;
+                this.SubredditText.Background = Brushes.Transparent;
                 return true;
             }
         }
         #endregion
+
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            SubredditText.Focus();
+        }
     }
 }

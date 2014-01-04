@@ -36,9 +36,9 @@ namespace RedditImageBrowser.Net
                     download.CancelAsync();
             }
 
-            // Just wipe out what we've got
             downloads = new ConcurrentQueue<Download>();
-            Start();
+            if (restart)
+                Start();
         }
 
         /// <summary>
@@ -62,7 +62,11 @@ namespace RedditImageBrowser.Net
         void DispatchDownload(object sender, ElapsedEventArgs e)
         {
             if (IsRunning()) {
-                Action action = () =>
+                //Action[] actions = new Action[max_concurrent];
+
+                //int c = 0;
+                //for (int i = current; i < max_concurrent; i++) {
+                    Action action = () =>
                     {
                         if (current < max_concurrent) {
                             Download download;
@@ -72,8 +76,11 @@ namespace RedditImageBrowser.Net
                             }
                         }
                     };
+                    //actions[c] = action;
+                    //c++;
+                //}
 
-                action.Invoke();
+                Parallel.Invoke(action);
             }
         }
 

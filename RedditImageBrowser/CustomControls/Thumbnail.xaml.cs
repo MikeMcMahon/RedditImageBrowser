@@ -30,6 +30,7 @@ namespace RedditImageBrowser.CustomControls
 
         public Thumbnail()
         {
+            // TODO - we have a memory leak with the imagebrush default behavior, will need to figure out a way to clear that up....
             InitializeComponent();
         }
 

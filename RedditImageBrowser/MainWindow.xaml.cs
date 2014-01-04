@@ -53,7 +53,7 @@ namespace RedditImageBrowser
             }
 
             {
-                ThumbnailDownloader = new DownloadManager(1, 250); // we set this to one so that they come in serially 
+                ThumbnailDownloader = new DownloadManager(5, 250); // we set this to one so that they come in serially 
                 ThumbnailDownloader.DownloadComplete += ThumbDownloader_DownloadComplete;
                 ThumbnailDownloader.DownloadProgressChanged += ThumbDownloader_DownloadProgressChanged;
                 ThumbnailDownloader.Start();
@@ -124,6 +124,7 @@ namespace RedditImageBrowser
                 var itemSource = (ObservableCollection<Listing.Child>)ThumbnailGrid.ItemsSource;
                 item.First().data.thumbnail = thumb;
                 itemSource.Add(item.First());
+                deferredThumbnails.Remove(item.First());
                 ThumbnailProgress.Value = 0;
             }
         }
@@ -162,6 +163,9 @@ namespace RedditImageBrowser
         {
             ((ObservableCollection<Listing.Child>)ThumbnailGrid.ItemsSource).Clear();
 
+            if (SelectedSubreddit.Equals(""))
+                return;
+
             Listing listings = RedditAPI.GetListing(SelectedSubreddit, PagesToDisplay);
             DeferThumbnails(listings);
         }
@@ -190,12 +194,6 @@ namespace RedditImageBrowser
             deferredThumbnails = listings.data.children;
         }
 
-        void label_RemoveClicked(object sender, SubredditLabel.RemoveClickedEventArgs e)
-        {
-            //this.SubredditLabels.Children.Remove(((UIElement)sender));
-        }
-
-
         /// <summary>
         /// The UI portion of when a subreddit is clicked on
         /// </summary>
@@ -205,7 +203,6 @@ namespace RedditImageBrowser
         {
             AddSubreddit dlg = new AddSubreddit();
             dlg.Owner = this;
-            dlg.WindowStartupLocation = System.Windows.WindowStartupLocation.CenterOwner;
             dlg.ShowDialog();
             
             if (dlg.DialogResult == true)
@@ -334,6 +331,11 @@ namespace RedditImageBrowser
             SubredditScroller.ScrollToVerticalOffset(SubredditScroller.VerticalOffset - RedditScrollOffset);
         }
 
+        /// <summary>
+        /// Navigates back a page
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void PrevPage_Click(object sender, RoutedEventArgs e)
         {
             var list = (ObservableCollection<Listing.Child>)ThumbnailGrid.ItemsSource;
@@ -369,6 +371,24 @@ namespace RedditImageBrowser
                 list.Clear();
                 DeferThumbnails(listings);
             }
+        }
+
+        /// <summary>
+        /// Removes the subreddit from display and selects the first available subreddit if one would otherwise be unselected
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void SubredditLabel_RemoveClicked(object sender, SubredditLabel.RemoveClickedEventArgs e)
+        {
+            Subreddits items = (Subreddits)SubredditsAvailable.ItemsSource;
+            string removedSubreddit = ((SubredditLabel)sender).Text.ToLower();
+            var found = items.Where(item => item.name.ToLower().Equals(removedSubreddit)).First();
+            items.Remove(found);
+
+            ApplicationConfig.SaveSubreddits();
+
+            if (SubredditsAvailable.SelectedItem == null && SubredditsAvailable.Items.Count > 0)
+                SubredditsAvailable.SelectedItem = SubredditsAvailable.Items[0];
         }
     }
 }
