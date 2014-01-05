@@ -6,6 +6,7 @@
         Height="720"
         Width="1280"
         DataContext="{StaticResource ConfigDataSource}"
+        Loaded="Window_Loaded"
         Closing="Window_Closing"
         ResizeMode="CanResizeWithGrip">
     <DockPanel>
@@ -206,33 +207,42 @@
                         <RowDefinition Height="50" />
                         <RowDefinition Height="*" />
                     </Grid.RowDefinitions>
-                    <WrapPanel Grid.Row="0">
-                        <WrapPanel.Background>
+                    <Grid Grid.Row="0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.Background>
                             <SolidColorBrush Color="{StaticResource DarkGray}" />
-                        </WrapPanel.Background>
-                        <Button x:Name="DownloadSelectedTopBar" 
-                                Content="&#xE118;"
-                                Foreground="White"
-                                ToolTip="Download Selected File(s)"
-                                Style="{StaticResource BaseToolbarButton}" Click="DownloadSelected_Click"/>
-                        <Button x:Name="RefreshTopBar" 
-                                Content="&#xE14A;"
-                                Foreground="White"
-                                ToolTip="Refresh Subreddit"
-                                Style="{StaticResource BaseToolbarButton}" Click="RefreshSubreddits"/>
-                        <Button x:Name="OpenConfigTopBar" Content="&#xE115;"
-                                Foreground="White"
-                                ToolTip="Configuration"
-                                Style="{StaticResource BaseToolbarButton}" Click="OpenConfiguration" />
-                        <Button x:Name="PrevPage" Content="&#xE100;"
-                                Foreground="White"
-                                ToolTip="Previous"
-                                Style="{StaticResource BaseToolbarButton}" Click="PrevPage_Click" />
-                        <Button x:Name="NextPage" Content="&#xE101;"
-                                Foreground="White"
-                                ToolTip="Next"
-                                Style="{StaticResource BaseToolbarButton}" Click="NextPage_Click"/>
-                    </WrapPanel>
+                        </Grid.Background>
+                        <WrapPanel Grid.Column="0">
+                            <Button x:Name="DownloadSelectedTopBar" 
+                                    Content="&#xE118;"
+                                    Foreground="White"
+                                    ToolTip="Download Selected File(s)"
+                                    Style="{StaticResource BaseToolbarButton}" Click="DownloadSelected_Click"/>
+                            <Button x:Name="RefreshTopBar" 
+                                    Content="&#xE14A;"
+                                    Foreground="White"
+                                    ToolTip="Refresh Subreddit"
+                                    Style="{StaticResource BaseToolbarButton}" Click="RefreshSubreddits"/>
+                            <Button x:Name="OpenConfigTopBar" Content="&#xE115;"
+                                    Foreground="White"
+                                    ToolTip="Configuration"
+                                    Style="{StaticResource BaseToolbarButton}" Click="OpenConfiguration" />
+                            <Button x:Name="PrevPage" Content="&#xE100;"
+                                    Foreground="White"
+                                    ToolTip="Previous"
+                                    Style="{StaticResource BaseToolbarButton}" Click="PrevPage_Click" />
+                            <Button x:Name="NextPage" Content="&#xE101;"
+                                    Foreground="White"
+                                    ToolTip="Next"
+                                    Style="{StaticResource BaseToolbarButton}" Click="NextPage_Click"/>
+                        </WrapPanel>
+                        <WrapPanel Orientation="Horizontal" VerticalAlignment="Bottom" Grid.Column="1">
+                            <TextBlock x:Name="LoggedInAsDisplay" Text="" Foreground="White" FontSize="16" />
+                        </WrapPanel>
+                    </Grid>
                     <ListView x:Name="ThumbnailGrid"
                               Grid.Row="1"
                               ScrollViewer.HorizontalScrollBarVisibility="Disabled"

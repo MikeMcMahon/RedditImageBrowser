@@ -33,6 +33,7 @@ namespace RedditImageBrowser
         DownloadManager ThumbnailDownloader = null;
         DownloadManager ImageDownloader = null;
         int RedditScrollOffset = 35;
+        bool DoLogin = false;
 
         /// <summary>
         /// A deferred set of thumbnails to be shown as their respective thumbnails are complete
@@ -42,23 +43,68 @@ namespace RedditImageBrowser
         public MainWindow()
         {
             InitializeComponent();
+        }
 
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
             ApplicationConfig = DataContext as Config;
             RedditAPI = new Reddit();
+
             {
                 ImageDownloader = new DownloadManager(2, 750);
                 ImageDownloader.DownloadComplete += ImageDownloader_DownloadComplete;
                 ImageDownloader.DownloadProgressChanged += ImageDownloader_DownloadProgressChanged;
                 ImageDownloader.Start();
             }
-
             {
                 ThumbnailDownloader = new DownloadManager(5, 250); // we set this to one so that they come in serially 
                 ThumbnailDownloader.DownloadComplete += ThumbDownloader_DownloadComplete;
                 ThumbnailDownloader.DownloadProgressChanged += ThumbDownloader_DownloadProgressChanged;
                 ThumbnailDownloader.Start();
             }
+
+            ((Config)DataContext).AppConfig.PropertyChanged += AppConfig_PropertyChanged;
+
             SubredditsAvailable.SelectedIndex = 0;
+
+            // Try to login
+            App.Current.Dispatcher.InvokeAsync(() =>
+            {
+                Login();
+            });
+        }
+
+        /// <summary>
+        /// When the properties changre we need to make specific changes to the app
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void AppConfig_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            var config = (AppConfig)sender;
+            switch (e.PropertyName) {
+            case "reddit_pages":
+                ThumbnailDownloader.CancelAllDownloads();
+                UpdateListings();
+                break;
+            case "username":
+                DoLogin = true;
+                break;
+            case "password":
+                DoLogin = true;
+                break;
+            default:
+                break;
+            }
+        }
+
+        void Login()
+        {
+            if (RedditAPI.Login(ApplicationConfig.AppConfig.username, AppConfig.Decrypt(ApplicationConfig.AppConfig.password))) {
+                LoggedInAsDisplay.Text = "/u/" + ApplicationConfig.AppConfig.username;
+            } else {
+                LoggedInAsDisplay.Text = "";
+            }
         }
 
         /// <summary>
@@ -251,9 +297,8 @@ namespace RedditImageBrowser
             Configuration config = new Configuration();
             config.ShowDialog();
 
-            if (config.DialogResult == true) {
-                ThumbnailDownloader.CancelAllDownloads();
-                UpdateListings();
+            if (config.DialogResult == true && DoLogin) {
+                Login();
             }
         }
 

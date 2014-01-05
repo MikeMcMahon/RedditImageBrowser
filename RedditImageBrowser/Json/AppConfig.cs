@@ -37,11 +37,10 @@ namespace RedditImageBrowser.Json
             }
             set
             {
-                if (value == null || value.Equals("")) {
+                if (value == null || value.Equals("")) 
                     SetProperty(ref _modhash, "");
-                } else {
+                else
                     SetProperty(ref _modhash, Encrypt(value));
-                }
             }
         }
 
@@ -59,11 +58,10 @@ namespace RedditImageBrowser.Json
             }
             set
             {
-                if (value == null || value.Equals("")) {
+                if (value == null || value.Equals(""))
                     SetProperty(ref _password, "");
-                } else {
+                else
                     SetProperty(ref _password, Encrypt(value));
-                }
             }
         }
         
@@ -82,7 +80,7 @@ namespace RedditImageBrowser.Json
         /// </summary>
         public int reddit_pages { get { return _reddit_pages; } set { SetProperty(ref _reddit_pages, value); } }
 
-        #region Weakest Encraption
+        #region Weakest Encraption Ever
         /// <summary>
         /// Decrypts an encrypted string
         /// </summary>
@@ -90,6 +88,9 @@ namespace RedditImageBrowser.Json
         /// <returns></returns>
         public static string Decrypt(string crypt)
         {
+            if (crypt == null || crypt.Equals(""))
+                return "";
+
             byte[] secured = Convert.FromBase64String(crypt);
             byte[] unsecured = System.Security.Cryptography.ProtectedData.Unprotect(secured, entropy, System.Security.Cryptography.DataProtectionScope.CurrentUser);
             return Encoding.Unicode.GetString(unsecured);
