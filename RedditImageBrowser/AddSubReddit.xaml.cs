@@ -76,6 +76,7 @@ namespace RedditImageBrowser
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             SubredditText.Focus();
+            SubredditText.CaretIndex = SubredditText.Text.Length;
         }
     }
 }

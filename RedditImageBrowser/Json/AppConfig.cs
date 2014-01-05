@@ -10,7 +10,7 @@ namespace RedditImageBrowser.Json
 {
     class AppConfig : BindableBase
     {
-        private byte[] entropy = { 1, 3, 27, 255, 23, 44, 108, 128 };
+        private static byte[] entropy = { 1, 3, 27, 255, 23, 44, 108, 128 };
         private string _username;
         private string _password;
         private string _download_directory;
@@ -33,15 +33,15 @@ namespace RedditImageBrowser.Json
                 if (_modhash == null)
                     return "";
 
-                byte[] secured = Convert.FromBase64String(_modhash);
-                byte[] unsecured = System.Security.Cryptography.ProtectedData.Unprotect(secured, entropy, System.Security.Cryptography.DataProtectionScope.CurrentUser);
-                return Encoding.Unicode.GetString(unsecured);
+                return _modhash;
             }
             set
             {
-                byte[] unsecured = Encoding.Unicode.GetBytes(value);
-                byte[] secured = System.Security.Cryptography.ProtectedData.Protect(unsecured, entropy, System.Security.Cryptography.DataProtectionScope.CurrentUser);
-                SetProperty(ref _modhash, Convert.ToBase64String(secured));
+                if (value == null || value.Equals("")) {
+                    SetProperty(ref _modhash, "");
+                } else {
+                    SetProperty(ref _modhash, Encrypt(value));
+                }
             }
         }
 
@@ -55,15 +55,15 @@ namespace RedditImageBrowser.Json
                 if (_password == null)
                     return "";
 
-                byte[] secured = Convert.FromBase64String(_password);
-                byte[] unsecured = System.Security.Cryptography.ProtectedData.Unprotect(secured, entropy, System.Security.Cryptography.DataProtectionScope.CurrentUser);
-                return Encoding.Unicode.GetString(unsecured);
+                return _password;
             }
             set
             {
-                byte[] unsecured = Encoding.Unicode.GetBytes(value);
-                byte[] secured = System.Security.Cryptography.ProtectedData.Protect(unsecured, entropy, System.Security.Cryptography.DataProtectionScope.CurrentUser);
-                SetProperty(ref _password, Convert.ToBase64String(secured));
+                if (value == null || value.Equals("")) {
+                    SetProperty(ref _password, "");
+                } else {
+                    SetProperty(ref _password, Encrypt(value));
+                }
             }
         }
         
@@ -81,5 +81,31 @@ namespace RedditImageBrowser.Json
         /// The number of reddit pages to seek
         /// </summary>
         public int reddit_pages { get { return _reddit_pages; } set { SetProperty(ref _reddit_pages, value); } }
+
+        #region Weakest Encraption
+        /// <summary>
+        /// Decrypts an encrypted string
+        /// </summary>
+        /// <param name="crypt"></param>
+        /// <returns></returns>
+        public static string Decrypt(string crypt)
+        {
+            byte[] secured = Convert.FromBase64String(crypt);
+            byte[] unsecured = System.Security.Cryptography.ProtectedData.Unprotect(secured, entropy, System.Security.Cryptography.DataProtectionScope.CurrentUser);
+            return Encoding.Unicode.GetString(unsecured);
+        }
+
+        /// <summary>
+        /// Encrypt a string (well use the current user encryption...meh)
+        /// </summary>
+        /// <param name="toCrypt"></param>
+        /// <returns></returns>
+        private static string Encrypt(string toCrypt)
+        {
+            byte[] unsecured = Encoding.Unicode.GetBytes(toCrypt);
+            byte[] secured = System.Security.Cryptography.ProtectedData.Protect(unsecured, entropy, System.Security.Cryptography.DataProtectionScope.CurrentUser);
+            return Convert.ToBase64String(secured);
+        }
+        #endregion
     }
 }

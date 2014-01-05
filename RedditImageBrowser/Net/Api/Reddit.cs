@@ -46,9 +46,10 @@ namespace RedditImageBrowser.Net.Api
             Dictionary<string, string> postData = new Dictionary<string,string>();
             postData.Add("query", subreddit);
             FormUrlEncodedContent httpContent = new FormUrlEncodedContent(postData);
-            HttpResponseMessage response = client.PostAsync(_API_URL + "/api/search_reddit_names.json", httpContent).Result;
-            string content = response.Content.ReadAsStringAsync().Result;
-            SubredditSearch.ByName names = Deserialize<SubredditSearch.ByName>(content);
+            SubredditSearch.ByName names = null;
+
+            if (!RedditFromPost<SubredditSearch.ByName>(_API_URL + "/api/search_reddit_names.json", postData, out names))
+                return false; // TODO - maybe a meaningful message should be dispatched? like hey, your fucking network bro
 
             foreach (string subredditName in names.names) {
                 if (subredditName.ToLower().Equals(subreddit.ToLower())) {
@@ -66,9 +67,9 @@ namespace RedditImageBrowser.Net.Api
         /// <returns></returns>
         public SubredditDetail SubredditDetails(string name)
         {
-            HttpResponseMessage response = client.GetAsync(_API_URL + name + "/about.json").Result;
-            string content = response.Content.ReadAsStringAsync().Result;
-            return Deserialize<SubredditDetail>(content);
+            SubredditDetail details = null;
+            RedditFromGet<SubredditDetail>(_API_URL + name + "/about.json", out details);
+            return details;
         }
 
         /// <summary>
@@ -81,19 +82,7 @@ namespace RedditImageBrowser.Net.Api
             return (subreddit.StartsWith("/r/")) ? subreddit.Substring(3) : subreddit;
         }
 
-
-        /// <summary>
-        /// Deserializes to an object using our converters
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="content"></param>
-        /// <returns></returns>
-        private T Deserialize<T>(string content)
-        {
-            // TODO - if received JSON is bad... CATCH IT
-            return JsonConvert.DeserializeObject<T>(content, converters);
-        }
-
+        #region Subreddit Listings
         /// <summary>
         /// Gets the listing
         /// </summary>
@@ -107,40 +96,35 @@ namespace RedditImageBrowser.Net.Api
             Listing listing = null;
             Listing tmpListing = null;
             string next = "";
+            bool success = false;
             
             if (!fullname.Equals(""))
                 next = GetListingDirection(forwards, fullname);
 
             int i = 0;
             do {
-                // TODO - how to handle if we receive a reddit is down message
-                using (HttpResponseMessage response = client.GetAsync(_API_URL + subreddit + ".json" + next).Result) {
-                    
-                    string content = response.Content.ReadAsStringAsync().Result;
+                if (listing == null)
+                    success = RedditFromGet<Listing>(_API_URL + subreddit + ".json" + next, out listing);
+                else
+                    success = RedditFromGet(_API_URL + subreddit + ".json" + next, out tmpListing);
 
-                    if (listing == null) {
-                        listing = Deserialize<Listing>(content);
-
-                        next = GetNextListingFullname(forwards, listing, next);
-
-                    } else {
-                        tmpListing = Deserialize<Listing>(content);
-
+                if (success) {
+                    if (tmpListing != null) {
                         foreach (var child in tmpListing.data.children) {
                             listing.data.children.Add(child);
                         }
-
-                        next = GetNextListingFullname(forwards, tmpListing, next);
                     }
 
-                    if (next == null || next.Equals(""))
-                        break;
-
-                    next = GetListingDirection(forwards, next);
-
-                    if (++i >= pages)
-                        break;
+                    GetNextListingFullname(forwards, listing, ref next);
                 }
+
+                if (next == null || next.Equals(""))
+                    break;
+
+                next = GetListingDirection(forwards, next);
+
+                if (++i >= pages)
+                    break;
             } while (true);
 
             if (tmpListing != null) {
@@ -195,15 +179,26 @@ namespace RedditImageBrowser.Net.Api
                 listing.data.children.Remove(bad);
         }
 
-        private static string GetNextListingFullname(bool forwards, Listing listing, string next)
+        /// <summary>
+        /// Gets the next listing item based on the direction of the scroll
+        /// </summary>
+        /// <param name="forwards"></param>
+        /// <param name="listing"></param>
+        /// <param name="next"></param>
+        private void GetNextListingFullname(bool forwards, Listing listing, ref string next)
         {
             if (forwards)
                 next = listing.data.after;
             else
                 next = listing.data.before;
-            return next;
         }
 
+        /// <summary>
+        /// Based on the scroll direction generate a key=>value param suitable to be slapped onto a URL
+        /// </summary>
+        /// <param name="forwards"></param>
+        /// <param name="fullname"></param>
+        /// <returns></returns>
         private string GetListingDirection(bool forwards, string fullname)
         {
             string direction = "";
@@ -215,6 +210,7 @@ namespace RedditImageBrowser.Net.Api
 
             return direction;
         }
+        #endregion
 
         /// <summary>
         /// Logs in via the standard login api call
@@ -227,7 +223,71 @@ namespace RedditImageBrowser.Net.Api
             return true;
         }
 
-        #region JsonConverters
+        #region Actually Querying the API 
+
+        /// <summary>
+        /// Returns a reddit deserialized object from a post method
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="url"></param>
+        /// <param name="postData"></param>
+        /// <param name="result"></param>
+        /// <returns></returns>
+        private bool RedditFromPost<T>(string url, Dictionary<string, string> postData, out T result)
+        {
+            FormUrlEncodedContent httpContent = new FormUrlEncodedContent(postData);
+            using (HttpResponseMessage response = client.PostAsync(url,httpContent).Result) {
+
+                if (!response.IsSuccessStatusCode) {
+                    result = (T)new Object();
+                    return false;
+                }
+
+                string content = response.Content.ReadAsStringAsync().Result;
+                result = Deserialize<T>(content);
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Returns a reddit deseralized object from a get method
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="url"></param>
+        /// <param name="result"></param>
+        /// <returns></returns>
+        private bool RedditFromGet<T>(string url, out T result)
+        {
+            using (HttpResponseMessage response = client.GetAsync(url).Result) {
+
+                if (!response.IsSuccessStatusCode) {
+                    result = (T)new Object();
+                    return false;
+                }
+
+                string content = response.Content.ReadAsStringAsync().Result;
+                result = Deserialize<T>(content);
+            }
+
+            return true;
+        }
+
+        #endregion
+
+        #region Json Related
+        /// <summary>
+        /// Deserializes to an object using our converters
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="content"></param>
+        /// <returns></returns>
+        private T Deserialize<T>(string content)
+        {
+            // TODO - if received JSON is bad... CATCH IT
+            return JsonConvert.DeserializeObject<T>(content, converters);
+        }
+
         private class NullBooleans : JsonConverter
         {
             public override bool CanConvert(Type objectType)

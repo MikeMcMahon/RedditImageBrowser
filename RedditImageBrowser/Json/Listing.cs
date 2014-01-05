@@ -10,6 +10,14 @@ namespace RedditImageBrowser.Json
 {
     class Listing
     {
+        public static Listing EmptyListing()
+        {
+            Listing l = new Listing();
+            l.data = new Data();
+            l.data.children = new ObservableCollection<Child>();
+            return l;
+        }
+
         public string kind { get; set; }
         public Data data { get; set; }
 

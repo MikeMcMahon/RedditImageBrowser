@@ -68,7 +68,7 @@
 			Grid.Row="1"
 			HorizontalAlignment="Left">
             <TextBox x:Name="Username" x:FieldModifier="private" Text="{Binding AppConfig.username, UpdateSourceTrigger=Explicit}" Style="{StaticResource ConfigurationInput}" />
-            <PasswordBox Style="{StaticResource PasswordInput}" />
+            <PasswordBox x:Name="Password" x:FieldModifier="private" Style="{StaticResource PasswordInput}" />
             <WrapPanel>
                 <TextBox x:Name="DownloadDir"
                          x:FieldModifier="private"

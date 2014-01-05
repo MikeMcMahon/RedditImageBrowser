@@ -32,7 +32,9 @@ namespace RedditImageBrowser
             Username.GetBindingExpression(TextBox.TextProperty).UpdateSource();
             DownloadDir.GetBindingExpression(TextBox.TextProperty).UpdateSource();
             RedditPages.GetBindingExpression(Slider.ValueProperty).UpdateSource();
-            
+
+            ((Config)DataContext).AppConfig.password = Password.Password;
+
             ((Config)DataContext).SaveConfig();
             
             this.Close();
