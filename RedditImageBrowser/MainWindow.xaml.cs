@@ -17,6 +17,7 @@ using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Media.Effects;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
@@ -32,8 +33,47 @@ namespace RedditImageBrowser
         Reddit RedditAPI = null;
         DownloadManager ThumbnailDownloader = null;
         DownloadManager ImageDownloader = null;
+        string NextPagePointer = "";
+        string PrevPagePointer = "";
+        
+
+        /// <summary>
+        /// The arbitrary and somewhat magical height of the reddit label
+        /// </summary>
         int RedditScrollOffset = 35;
+
+        /// <summary>
+        /// Will be set after a configuration change that modifies the username and or password
+        /// </summary>
         bool DoLogin = false;
+
+
+        /// <summary>
+        /// Gets the selected subreddit
+        /// </summary>
+        /// <returns></returns>
+        private string SelectedSubreddit
+        {
+            get
+            {
+                Subscribed item = (Subscribed)SubredditsAvailable.SelectedItem;
+                if (item != null)
+                    return item.name;
+
+                return "";
+            }
+        }
+
+        /// <summary>
+        /// Gets the pages to display 
+        /// </summary>
+        private int PagesToDisplay
+        {
+            get
+            {
+                return ((Config)DataContext).AppConfig.reddit_pages;
+            }
+        }
 
         /// <summary>
         /// A deferred set of thumbnails to be shown as their respective thumbnails are complete
@@ -51,7 +91,7 @@ namespace RedditImageBrowser
             RedditAPI = new Reddit();
 
             {
-                ImageDownloader = new DownloadManager(2, 750);
+                ImageDownloader = new DownloadManager(10, 750);
                 ImageDownloader.DownloadComplete += ImageDownloader_DownloadComplete;
                 ImageDownloader.DownloadProgressChanged += ImageDownloader_DownloadProgressChanged;
                 ImageDownloader.Start();
@@ -98,13 +138,47 @@ namespace RedditImageBrowser
             }
         }
 
+        /// <summary>
+        /// Login to reddit and obtain details about myself
+        /// </summary>
         void Login()
         {
-            if (RedditAPI.Login(ApplicationConfig.AppConfig.username, AppConfig.Decrypt(ApplicationConfig.AppConfig.password))) {
-                LoggedInAsDisplay.Text = "/u/" + ApplicationConfig.AppConfig.username;
-            } else {
-                LoggedInAsDisplay.Text = "";
+            AboutMe details = null;//RedditAPI.UserInfo(ApplicationConfig.AppConfig.cookie);
+
+            //if (!UpdateUserInfo(details)) {
+                Login loginResults = null;
+                //if (RedditAPI.Login(ApplicationConfig.AppConfig.username, ApplicationConfig.AppConfig.password, out loginResults)) {
+
+                    // Store the cookie for later
+                //    ApplicationConfig.AppConfig.cookie = loginResults.json.data.cookie;
+                //    ApplicationConfig.SaveConfig();
+
+                //    details = RedditAPI.UserInfo();
+                //    UpdateUserInfo(details);
+                //} else {
+                    LoggedInAsDisplay.Text = "";
+                //}
+            //}
+        }
+
+        /// <summary>
+        /// For the given aboutme details update the ui
+        /// </summary>
+        /// <param name="details"></param>
+        /// <returns></returns>
+        bool UpdateUserInfo(AboutMe details)
+        {
+            if (details.data != null) {
+                LoggedInAsDisplay.Text = "/u/" + details.data.name;
+
+                if (details.data.is_gold) {
+                    LoggedInAsDisplay.Foreground = Brushes.Gold;
+                }
+
+                return true;
             }
+
+            return false;
         }
 
         /// <summary>
@@ -176,33 +250,6 @@ namespace RedditImageBrowser
         }
 
         /// <summary>
-        /// Gets the selected subreddit
-        /// </summary>
-        /// <returns></returns>
-        private string SelectedSubreddit
-        {
-            get
-            {
-                Subscribed item = (Subscribed)SubredditsAvailable.SelectedItem;
-                if (item != null)
-                    return item.name;
-
-                return "";
-            }
-        }
-
-        /// <summary>
-        /// Gets the pages to display 
-        /// </summary>
-        private int PagesToDisplay
-        {
-            get
-            {
-                return ((Config)DataContext).AppConfig.reddit_pages;
-            }
-        }
-
-        /// <summary>
         /// Clears and updates the listing for the given subreddit
         /// </summary>
         void UpdateListings()
@@ -230,14 +277,17 @@ namespace RedditImageBrowser
                     downloadUrl = null;
                 }
 
-                if (downloadUrl != null)
+                if (downloadUrl != null) {
                     ThumbnailDownloader.AddDownload(child.data.name, downloadUrl, System.IO.Path.Combine(ApplicationConfig.AppConfig.thumbnail_directory, child.data.name + ".jpg"));
+                }
             }
 
             if (deferredThumbnails != null)
                 deferredThumbnails.Clear();
 
             deferredThumbnails = listings.data.children;
+            NextPagePointer = listings.data.children.Last().data.name;
+            PrevPagePointer = listings.data.children.First().data.name;
         }
 
         /// <summary>
@@ -298,7 +348,11 @@ namespace RedditImageBrowser
             config.ShowDialog();
 
             if (config.DialogResult == true && DoLogin) {
-                Login();
+                App.Current.Dispatcher.InvokeAsync(() =>
+                {
+                    Login();
+                });
+                DoLogin = false;
             }
         }
 
@@ -385,8 +439,7 @@ namespace RedditImageBrowser
         {
             var list = (ObservableCollection<Listing.Child>)ThumbnailGrid.ItemsSource;
             if (list.Count > 0) {
-                var firstItem = list.First<Listing.Child>();
-                Listing listings = RedditAPI.GetListing(SelectedSubreddit, PagesToDisplay, false, firstItem.data.name);
+                Listing listings = RedditAPI.GetListing(SelectedSubreddit, PagesToDisplay, false, PrevPagePointer);
 
                 if (listings.data.children.Count == 0)
                     return;
@@ -407,7 +460,7 @@ namespace RedditImageBrowser
             var list = (ObservableCollection<Listing.Child>)ThumbnailGrid.ItemsSource;
             if (list.Count > 0) {
                 var lastItem = list.Last<Listing.Child>();
-                Listing listings = RedditAPI.GetListing(SelectedSubreddit, PagesToDisplay, true, lastItem.data.name);
+                Listing listings = RedditAPI.GetListing(SelectedSubreddit, PagesToDisplay, true, NextPagePointer);
 
                 if (listings.data.children.Count == 0)
                     return;

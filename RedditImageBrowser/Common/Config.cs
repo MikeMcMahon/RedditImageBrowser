@@ -99,6 +99,7 @@ namespace RedditImageBrowser.Common
     ""username"":"""",
     ""password"":"""",
     ""modhash"":"""",
+    ""cookie"":"""",
     ""download_directory"": ""{0}"",
     ""reddit_pages"": {1}
 }}",

@@ -4,6 +4,7 @@ using RedditImageBrowser.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
@@ -24,6 +25,7 @@ namespace RedditImageBrowser.Net.Api
         /// Use this API URL until we are authenticated into the system
         /// </summary>
         private const string _API_URL = @"http://www.reddit.com/";
+        private const string _SSL_LOGIN_URL = @"https://ssl.reddit.com/api/login";
 
         private HttpClient client = new HttpClient();
 
@@ -98,7 +100,7 @@ namespace RedditImageBrowser.Net.Api
             string next = "";
             bool success = false;
             
-            if (!fullname.Equals(""))
+            if (fullname != null && !fullname.Equals(""))
                 next = GetListingDirection(forwards, fullname);
 
             int i = 0;
@@ -110,11 +112,25 @@ namespace RedditImageBrowser.Net.Api
 
                 if (success) {
                     if (tmpListing != null) {
-                        foreach (var child in tmpListing.data.children) {
-                            listing.data.children.Add(child);
+                        if (forwards) {
+                            foreach (var child in tmpListing.data.children) {
+                                listing.data.children.Add(child);
+                            }
+                        } else {
+                            List<Listing.Child> tmp = new List<Listing.Child>();
+                            tmp.AddRange(tmpListing.data.children);
+                            tmp.AddRange(listing.data.children);
+                            listing.data.children.Clear();
+                            tmp.ForEach(child =>
+                            {
+                                listing.data.children.Add(child);
+                            });
                         }
-                    }
 
+                      //  GetNextListingFullname(forwards, tmpListing, ref next);
+                    } else {
+                    //    GetNextListingFullname(forwards, listing, ref next);
+                    }
                     GetNextListingFullname(forwards, listing, ref next);
                 }
 
@@ -187,10 +203,18 @@ namespace RedditImageBrowser.Net.Api
         /// <param name="next"></param>
         private void GetNextListingFullname(bool forwards, Listing listing, ref string next)
         {
-            if (forwards)
-                next = listing.data.after;
+            Listing.Child child = null;
+            if (listing.data.children.Count > 0) {
+                if (forwards)
+                    child = listing.data.children.Last();
+                else
+                    child = listing.data.children.First();
+            }
+
+            if (child != null)
+                next = child.data.name;
             else
-                next = listing.data.before;
+                next = "";
         }
 
         /// <summary>
@@ -218,9 +242,59 @@ namespace RedditImageBrowser.Net.Api
         /// <param name="username"></param>
         /// <param name="password"></param>
         /// <returns></returns>
-        public bool Login(string username, string password)
+        public bool Login(string username, string password, out Login result)
         {
-            return true;
+            Dictionary<string, string> httpData = new Dictionary<string, string>();
+            httpData.Add("rem", "True");
+            httpData.Add("api_type", "json");
+            httpData.Add("user", username);
+            httpData.Add("passwd", AppConfig.Decrypt(password));
+
+            if (RedditFromPost<Login>(_SSL_LOGIN_URL, httpData, out result)) {
+                if (result.json.errors.Count > 0) {
+                    return false;
+                }
+
+                SetCookie(result.json.data.cookie);
+                return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// If called after logging in returns the information for this user
+        /// </summary>
+        /// <returns></returns>
+        public AboutMe UserInfo(string cookie="")
+        {
+            AboutMe details = null;
+
+            if (cookie != null && !cookie.Equals(""))
+                SetCookie(cookie);
+
+            RedditFromGet<AboutMe>(_API_URL + "/api/me.json", out details);
+
+            return details;
+        }
+
+        /// <summary>
+        /// Required as part of the reddit CSRF
+        /// </summary>
+        /// <param name="modhash"></param>
+        private void SetModHash(string modhash)
+        {
+            client.DefaultRequestHeaders.Add("X-Modhash", modhash);
+        }
+
+        /// <summary>
+        /// The reddit session cookie to use! 
+        /// </summary>
+        /// <param name="cookie"></param>
+        private void SetCookie(string cookie)
+        {
+            string encoded = WebUtility.UrlEncode(cookie);
+            client.DefaultRequestHeaders.Add("Cookie", "reddit_session=" + encoded + "; Domain=.reddit.com; Path=/;");
         }
 
         #region Actually Querying the API 
@@ -233,13 +307,13 @@ namespace RedditImageBrowser.Net.Api
         /// <param name="postData"></param>
         /// <param name="result"></param>
         /// <returns></returns>
-        private bool RedditFromPost<T>(string url, Dictionary<string, string> postData, out T result)
+        private bool RedditFromPost<T>(string url, Dictionary<string, string> postData, out T result) where T : JsonApi
         {
             FormUrlEncodedContent httpContent = new FormUrlEncodedContent(postData);
-            using (HttpResponseMessage response = client.PostAsync(url,httpContent).Result) {
+            using (HttpResponseMessage response = client.PostAsync(url, httpContent).Result) {
 
                 if (!response.IsSuccessStatusCode) {
-                    result = (T)new Object();
+                    result = (T)new JsonApi();
                     return false;
                 }
 

@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace RedditImageBrowser.Json
 {
-    class Listing
+    class Listing : JsonApi
     {
         public static Listing EmptyListing()
         {

@@ -80,6 +80,8 @@ namespace RedditImageBrowser.Json
         /// </summary>
         public int reddit_pages { get { return _reddit_pages; } set { SetProperty(ref _reddit_pages, value); } }
 
+        public string cookie { get; set; }
+
         #region Weakest Encraption Ever
         /// <summary>
         /// Decrypts an encrypted string

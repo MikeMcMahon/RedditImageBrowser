@@ -6,11 +6,7 @@ using System.Threading.Tasks;
 
 namespace RedditImageBrowser.Json
 {
-    public class SubredditSearch
+    public class JsonApi
     {
-        public class ByName : JsonApi
-        {
-            public List<string> names { get; set; }
-        }
     }
 }

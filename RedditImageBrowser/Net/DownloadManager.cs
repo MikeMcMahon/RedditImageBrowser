@@ -14,10 +14,16 @@ namespace RedditImageBrowser.Net
         private static int max_concurrent;
         private static int current = 0;
         private bool running = false;
-        private List<System.Net.WebClient> downloader;
+        private ConcurrentBag<System.Net.WebClient> download_clients = new ConcurrentBag<System.Net.WebClient>();
+        private ConcurrentBag<System.Net.WebClient> active_downloads = new ConcurrentBag<System.Net.WebClient>();
         private Timer timer;
 
-        public DownloadManager(int concurrent = 2, double interval = 100)
+        /// <summary>
+        /// Downloads thumbnails 
+        /// </summary>
+        /// <param name="concurrent"> total number of concurrent downloads</param>
+        /// <param name="interval"> time between checking for new downloads</param>
+        public DownloadManager(int concurrent = 2, double interval = 200)
         {
             max_concurrent = concurrent;
             this.ConstructDownloaders();
@@ -31,10 +37,15 @@ namespace RedditImageBrowser.Net
         public void CancelAllDownloads(bool restart=true)
         {
             Stop();
-            foreach (var download in downloader) {
-                if (download.IsBusy)
-                    download.CancelAsync();
+
+            foreach (var client in active_downloads) {
+                if (client.IsBusy)
+                    client.CancelAsync();
+
+                client.Dispose();
             }
+
+            active_downloads = new ConcurrentBag<System.Net.WebClient>();
 
             downloads = new ConcurrentQueue<Download>();
             if (restart)
@@ -46,41 +57,63 @@ namespace RedditImageBrowser.Net
         /// </summary>
         private void ConstructDownloaders()
         {
-            downloader = new List<System.Net.WebClient>(max_concurrent);
-
             for (int i = 0; i < max_concurrent; i++) {
-                downloader.Add(new System.Net.WebClient());
-                downloader[i].DownloadFileCompleted += DownloadFileCompleted;
+                download_clients.Add(SingleDownloader);
             }
         }
 
+        /// <summary>
+        /// Cleans up resources when a download is complete, decrementing the current number of don
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         void DownloadFileCompleted(object sender, System.ComponentModel.AsyncCompletedEventArgs e)
         {
             System.Threading.Interlocked.Add(ref current, -1);
+
+            System.Net.WebClient client = (System.Net.WebClient)sender;
+            client.Dispose();
+
+            if (active_downloads.Contains(client)) {
+                active_downloads.TakeWhile(active => active == client);
+            }
+
+            download_clients.Add(SingleDownloader);
+
+        }
+
+        private System.Net.WebClient SingleDownloader
+        {
+            get
+            {
+                System.Net.WebClient client = new System.Net.WebClient();
+                client.DownloadFileCompleted += DownloadFileCompleted;
+
+                return client;
+            }
         }
 
         void DispatchDownload(object sender, ElapsedEventArgs e)
         {
             if (IsRunning()) {
-                //Action[] actions = new Action[max_concurrent];
+                Action[] actions = new Action[download_clients.Count()];
 
-                //int c = 0;
-                //for (int i = current; i < max_concurrent; i++) {
+                int c = 0;
+                for (int i = 0; i < actions.Count(); i++) {
                     Action action = () =>
                     {
-                        if (current < max_concurrent) {
+                        //if (current < max_concurrent) {
                             Download download;
                             if (downloads.TryDequeue(out download)) {
-                                // Try to download the file
                                 DispatchToFirstAvailable(download);
                             }
-                        }
+                        //}
                     };
-                    //actions[c] = action;
-                    //c++;
-                //}
+                    actions[c] = action;
+                    c++;
+                }
 
-                Parallel.Invoke(action);
+                Parallel.Invoke(actions);
             }
         }
 
@@ -90,33 +123,34 @@ namespace RedditImageBrowser.Net
         /// <param name="?"></param>
         private void DispatchToFirstAvailable(Download download)
         {
-            foreach (var dl in downloader) {
-                if (!dl.IsBusy) {
-                    System.Threading.Interlocked.Add(ref current, 1);
-                    // Create an assign a handler for relaying the dl is complete that will uregister the handler once it is complete
-                    System.ComponentModel.AsyncCompletedEventHandler downloaded = null;
-                    downloaded = delegate(object sender, System.ComponentModel.AsyncCompletedEventArgs e)
-                    {
-                        if (e.Cancelled)
-                            return;
+            System.Net.WebClient client = null;
+            download_clients.TryTake(out client);
 
-                        this.OnDownloadComplete(new DownloadCompleteArgs(download.Id, download.Destination));
-                        (sender as System.Net.WebClient).DownloadFileCompleted -= downloaded;
-                    };
-                    System.Net.DownloadProgressChangedEventHandler changed = null;
-                    changed = delegate(object sender, System.Net.DownloadProgressChangedEventArgs e)
-                    {
-                        this.OnDownloadProgressChanged(new DownloadProgressChangedArgs(download.Id, e.ProgressPercentage));
+            if (client != null) {
+                System.Threading.Interlocked.Add(ref current, 1);
+                // Create an assign a handler for relaying the dl is complete that will uregister the handler once it is complete
+                System.ComponentModel.AsyncCompletedEventHandler downloaded = null;
+                downloaded = delegate(object sender, System.ComponentModel.AsyncCompletedEventArgs e)
+                {
+                    if (e.Cancelled)
+                        return;
 
-                        if (e.ProgressPercentage >= 99)
-                            (sender as System.Net.WebClient).DownloadProgressChanged -= changed;
-                    };
+                    this.OnDownloadComplete(new DownloadCompleteArgs(download.Id, download.Destination));
+                    (sender as System.Net.WebClient).DownloadFileCompleted -= downloaded;
+                };
+                System.Net.DownloadProgressChangedEventHandler changed = null;
+                changed = delegate(object sender, System.Net.DownloadProgressChangedEventArgs e)
+                {
+                    this.OnDownloadProgressChanged(new DownloadProgressChangedArgs(download.Id, e.ProgressPercentage));
 
-                    dl.DownloadFileCompleted += downloaded;
-                    dl.DownloadProgressChanged += changed;
-                    dl.DownloadFileAsync(download.URL, download.Destination);
-                    break;
-                }
+                    if (e.ProgressPercentage >= 99)
+                        (sender as System.Net.WebClient).DownloadProgressChanged -= changed;
+                };
+
+                client.DownloadFileCompleted += downloaded;
+                client.DownloadProgressChanged += changed;
+                client.DownloadFileAsync(download.URL, download.Destination);
+                active_downloads.Add(client);
             }
         }
 
@@ -146,7 +180,7 @@ namespace RedditImageBrowser.Net
         /// <returns></returns>
         public bool DownloaderBusy()
         {
-            foreach (var dl in downloader) {
+            foreach (var dl in active_downloads) {
                 if (dl.IsBusy)
                     return true;
             }
@@ -227,14 +261,17 @@ namespace RedditImageBrowser.Net
             do {
                 isBusy = false;
 
-                downloader.ForEach(dl =>
-                {
-                    if (dl.IsBusy)
+                foreach (var download in active_downloads) {
+                    if (download.IsBusy)
                         isBusy = true;
                     else
-                        dl.Dispose();
-                });
+                        download.Dispose();
+                }
             } while (isBusy);
+
+            foreach (var download in download_clients) {
+                download.Dispose();
+            }
         }
         
         public struct Download

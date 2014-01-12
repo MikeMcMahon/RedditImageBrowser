@@ -74,12 +74,15 @@
     </ApplicationDefinition>
     <Compile Include="Common\Config.cs" />
     <Compile Include="DataSource\SubredditContent.cs" />
+    <Compile Include="Json\AboutMe.cs" />
     <Compile Include="Json\AppConfig.cs" />
     <Compile Include="Common\BindableBase.cs" />
+    <Compile Include="Json\JsonApi.cs" />
     <Compile Include="Json\Listing.cs" />
     <Compile Include="Json\SubredditDetail.cs" />
     <Compile Include="Json\SubredditSearch.cs" />
     <Compile Include="Json\Subreddits.cs" />
+    <Compile Include="Json\Login.cs" />
     <Compile Include="Net\DownloadManager.cs" />
     <Compile Include="Net\Api\Reddit.cs" />
     <Compile Include="CustomControls\SubredditLabel.xaml.cs">
